@@ -3,28 +3,13 @@
 ## Project Overview
 **Tech Stack:** React + FastAPI + MongoDB + Socket.IO  
 **Last Updated:** April 9, 2026
-**Deployed:** https://deployment-preview-11.preview.emergentagent.com
-
----
-
-## Recent Changes
-
-### April 9, 2026 - Real-time Toast System
-- Enhanced Toast component with action buttons + description
-- RealtimeBridge for all roles with navigation callbacks
-- Slide-in-right animation for toasts
-- Connected to WebSocket events
-
-### April 9, 2026 - Auth & Landing Redesign  
-- Fixed auth forms: dark inputs, fixed Back button
-- Header: Log in + Get Started (no duplicates)
-- Emergent-style landing with bento grid
+**Status:** Deployed and Running
 
 ---
 
 ## Architecture
 
-### 3 Cabinets
+### 3 Cabinets (Personal Areas)
 1. **CLIENT** - /client/* - Projects, Deliverables, Support
 2. **EXECUTOR** - /developer/*, /tester/* - Kanban, Assignments, Validation
 3. **ADMIN** - /admin/* - Control Center, Pipeline, Alerts
@@ -37,28 +22,82 @@
 
 ---
 
-## Event Priority
+## Core Features
 
-### HIGH (toast + action)
-- workunit.assigned
-- workunit.revision_requested
-- deliverable.created
-- alert.created
+### Authentication
+- Email/Password registration and login
+- bcrypt password hashing
+- Demo access for all roles
+- Session management with cookies
+- Admin seeded automatically (admin@devos.local / admin123)
 
-### MEDIUM (toast)
-- project.updated
-- support.updated
-- submission.reviewed
+### Client Features
+- Create project requests
+- View projects and deliverables
+- Approve/reject deliverables
+- Support tickets
 
-### LOW (silent refresh)
-- Background stats updates
+### Developer Features
+- Kanban board view
+- Work unit assignments
+- Work logging
+- Submit work for review
+
+### Tester Features
+- Validation tasks
+- Issue reporting
+- Pass/fail validations
+
+### Admin Features
+- Control center
+- User management
+- Project/scope creation
+- Work unit assignment
+- Deliverable builder
+
+---
+
+## API Endpoints
+
+### Auth
+- POST /api/auth/register - User registration
+- POST /api/auth/login - User login
+- POST /api/auth/demo - Demo access
+- GET /api/auth/me - Current user
+- POST /api/auth/logout - Logout
+
+### Public
+- GET /api/stats - Platform statistics
+- GET /api/portfolio/cases - Portfolio cases
+
+### Client
+- GET /api/projects/mine - My projects
+- POST /api/requests - Create request
+- GET /api/deliverables/{id} - Get deliverable
+
+### Developer
+- GET /api/developer/work-units - My work units
+- POST /api/work-units/{id}/submit - Submit work
+
+### Admin
+- GET /api/admin/users - All users
+- POST /api/admin/assign - Assign work
+
+---
+
+## URLs
+- Landing: /
+- Client: /client/auth, /client/dashboard
+- Builder: /builder/auth, /developer/dashboard
+- Tester: /tester/dashboard
+- Admin: /admin/login, /admin/control-center
 
 ---
 
 ## Backlog
 
 ### P1 - In-app Notification Center (NEXT)
-- [ ] 🔔 Bell icon in header
+- [ ] Bell icon in header
 - [ ] Unread count badge
 - [ ] Dropdown with notification history
 - [ ] Mark as read
@@ -72,36 +111,3 @@
 
 ### P4 - i18n
 - [ ] After UI stabilization
-
----
-
-## URLs
-- Landing: /
-- Client: /client/auth, /client/dashboard
-- Builder: /builder/auth, /developer/dashboard
-- Tester: /tester/dashboard
-- Admin: /admin/login, /admin/control-center
-
----
-
-## Security Audit - April 9, 2026
-
-### P0 Completed ✅
-
-1. **bcrypt password hashing**
-   - `hash_password()` with salt
-   - `verify_password()` secure comparison
-   - Old SHA-256 passwords deprecated
-
-2. **Socket.IO authentication**
-   - `authenticate` event verifies session
-   - Room join validation by user/role/project ownership
-   - Denied rooms logged
-
-3. **Ownership checks**
-   - `verify_deliverable_ownership()` helper
-   - Projects: client can only see own
-   - Deliverables: approve/reject require ownership
-
-### Migration Required
-- Users with SHA-256 passwords need password reset
