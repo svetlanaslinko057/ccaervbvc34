@@ -1,0 +1,97 @@
+{
+  "theme": "dark",
+  "archetype": "Archetype 4 (Swiss & High-Contrast - Dark Variant)",
+  "design_philosophy": "Emergent Style: Depth, readability, modern aesthetics without empty spaces. Driven by high-contrast structural borders, deep shadows, and cinematic lighting to replace flat black voids.",
+  "colors": {
+    "background": "#05050A",
+    "surface": "#111116",
+    "surface_glass": "rgba(17, 17, 22, 0.7)",
+    "primary": "#2563EB",
+    "primary_hover": "#3B82F6",
+    "text_main": "#FFFFFF",
+    "text_muted": "#A1A1AA",
+    "border": "rgba(255, 255, 255, 0.1)",
+    "accent_glow": "rgba(37, 99, 235, 0.5)"
+  },
+  "typography": {
+    "heading_font": "Outfit",
+    "body_font": "JetBrains Mono",
+    "scale": {
+      "h1": "text-5xl sm:text-6xl tracking-tighter font-medium",
+      "h2": "text-3xl sm:text-4xl tracking-tight font-medium",
+      "h3": "text-xl sm:text-2xl tracking-tight font-medium",
+      "body": "text-base leading-relaxed",
+      "label": "text-xs tracking-[0.2em] uppercase text-muted"
+    }
+  },
+  "layout_and_spacing": {
+    "container": "max-w-7xl mx-auto px-6 sm:px-12",
+    "section_padding": "py-24 sm:py-32",
+    "bento_grid": "grid grid-cols-1 md:grid-cols-12 gap-6",
+    "surface_styles": {
+      "glass": "backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]",
+      "flat_technical": "bg-[#111116] border border-white/10 relative overflow-hidden",
+      "tracing_beam": "relative overflow-hidden border border-white/10 shadow-[0_0_15px_rgba(37,99,235,0.1)] hover:shadow-[0_0_25px_rgba(37,99,235,0.2)] transition-shadow duration-300"
+    }
+  },
+  "sections": [
+    {
+      "id": "header",
+      "type": "navigation",
+      "instructions": "Sticky glassmorphism header (z-50). Logo on left, nav links center, 'Start Project' primary CTA on right. Must not be fully transparent. Add pt-[80px] to main to prevent overlap.",
+      "components": ["Navigation", "CTA Button"]
+    },
+    {
+      "id": "hero",
+      "type": "hero_section",
+      "layout": "Grid cols-1 md:grid-cols-2 gap-12 items-center. Left: Typography. Right: Hero visual.",
+      "instructions": "Massive H1 with tight tracking. Use the 'hero_bg' as a subtle background visual for the right column or behind the entire section with bg-black/50 overlay. Do not let the image overpower the text. Primary CTA 'Start Project' (solid), Secondary CTA 'Join as Builder' (outline/glass).",
+      "media_urls": {
+        "hero_bg": "https://static.prod-images.emergentagent.com/jobs/70120df5-824e-4d4e-b8dc-1a4556713200/images/64ffe797a50f1868e997b417f8fd0bb29f49c2f437047e9a73ea04a767c23a3a.png"
+      }
+    },
+    {
+      "id": "workflow",
+      "type": "bento_grid",
+      "layout": "Mode A: Tetris Grid. md:grid-cols-12. Asymmetrical layout.",
+      "instructions": "Visualize the 'Submit -> Execute -> Ship' process. Avoid empty spaces by making every card functional. 'Submit' (col-span-4): Form UI mockup. 'Execute' (col-span-8): Hero card showing the 'terminal_code' image and animated code lines. 'Ship' (col-span-12 or 6): Show 'workflow_ship' image with launch metrics. Use 'tracing_beam' surface styles for cards.",
+      "media_urls": {
+        "terminal_code": "https://static.prod-images.emergentagent.com/jobs/70120df5-824e-4d4e-b8dc-1a4556713200/images/65440009f9ca3a8ef4f630206bfb926b7e323e1669690729dd31687e7de48f36.png",
+        "workflow_ship": "https://static.prod-images.emergentagent.com/jobs/70120df5-824e-4d4e-b8dc-1a4556713200/images/1318cc503d1041a0941a4bd095244fff64b591ab3391a8cf35bb692ce89a6bf9.png"
+      }
+    },
+    {
+      "id": "builders",
+      "type": "feature_split",
+      "layout": "Grid cols-1 md:grid-cols-2 gap-16 items-center.",
+      "instructions": "Section for developers. Left: Image of developer coding with a glass overlay card showing tech stack icons. Right: H2 'Join as Builder', bullet points using JetBrains Mono, CTA 'Apply to Build'.",
+      "media_urls": {
+        "developer_img": "https://images.unsplash.com/photo-1719400471588-575b23e27bd7?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzV8MHwxfHNlYXJjaHwzfHxzb2Z0d2FyZSUyMGRldmVsb3BlciUyMGNvZGluZyUyMGRhcmt8ZW58MHx8fHwxNzc1NzQwMjUxfDA&ixlib=rb-4.1.0&q=85"
+      }
+    },
+    {
+      "id": "cta",
+      "type": "call_to_action",
+      "layout": "Centered content in a technical grid-bordered box.",
+      "instructions": "Grid Borders look (Technical variant). Expose the skeleton. High contrast text. Primary CTA to 'Start Project'. Use subtle glow behind the text."
+    },
+    {
+      "id": "footer",
+      "type": "footer",
+      "layout": "Massive padding py-24. Grid columns.",
+      "instructions": "Dark background (#020205) to contrast with body. Massive text 'Development OS' on top or bottom. Links in columns. Include 'data-testid' on all links."
+    }
+  ],
+  "motion_and_interactions": {
+    "hover_states": "Interactive elements must shift in brightness. Buttons get a subtle inner shadow or scale up. Cards translate-y-1 and increase border opacity.",
+    "animations": "Use Framer Motion for staggered entrance of Bento Grid items. Animated workflow demo should simulate typing code or a marquee of active terminal commands."
+  },
+  "accessibility_and_testing": {
+    "testing": "MUST include data-testid on all buttons, nav links, and form inputs (e.g., 'start-project-hero-button', 'join-builder-cta').",
+    "contrast": "Ensure text over images has sufficient contrast using text-shadow or gradient overlays. Focus states must have high contrast rings."
+  },
+  "icons": {
+    "library": "lucide-react",
+    "style": "Technical, minimal. Do not use solid filled icons unless for active states."
+  }
+}
