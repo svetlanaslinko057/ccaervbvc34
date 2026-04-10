@@ -92,11 +92,12 @@ const ClientHub = () => {
                 value={idea}
                 onChange={(e) => setIdea(e.target.value)}
                 placeholder="Build me a marketplace for vintage cars where sellers can list vehicles with history, buyers can browse and make offers..."
-                className={`w-full h-32 bg-[#0d1117] border rounded-2xl px-5 py-4 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 resize-none text-lg transition-all ${
+                className={`w-full h-32 bg-[#0d1117] border-2 rounded-2xl px-5 py-4 text-white placeholder:text-white/30 focus:outline-none resize-none text-lg transition-all caret-blue-400 selection:bg-blue-500/30 ${
                   idea.length > 0 && !isValidIdea 
-                    ? 'border-amber-500/50 focus:border-amber-500/50 focus:ring-amber-500/20' 
-                    : 'border-white/10 focus:border-blue-500/50 focus:ring-blue-500/20'
+                    ? 'border-amber-500/60 focus:border-amber-400 focus:shadow-[0_0_20px_rgba(245,158,11,0.15)]' 
+                    : 'border-white/20 focus:border-blue-500 focus:shadow-[0_0_30px_rgba(59,130,246,0.2)]'
                 }`}
+                style={{ textShadow: 'none' }}
                 data-testid="idea-input"
               />
             </div>

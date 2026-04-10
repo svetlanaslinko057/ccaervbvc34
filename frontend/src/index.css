@@ -20,6 +20,16 @@
   animation: slide-up 0.3s ease-out;
 }
 
+/* Shimmer Animation */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
 /* ============================================
    DEV OS - Emergent-style Design System
    Pure Black & White, Production-grade

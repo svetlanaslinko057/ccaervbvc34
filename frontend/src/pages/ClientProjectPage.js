@@ -232,35 +232,88 @@ const ClientProjectPage = () => {
 // ============ SUB COMPONENTS ============
 
 const AIProcessingBlock = ({ progress }) => (
-  <div className="rounded-3xl bg-gradient-to-br from-violet-500/20 to-blue-500/10 border border-violet-500/30 p-8 mb-8">
-    <div className="flex items-center gap-4 mb-6">
-      <div className="w-14 h-14 rounded-2xl bg-violet-500/20 flex items-center justify-center">
-        <Sparkles className="w-7 h-7 text-violet-400 animate-pulse" />
-      </div>
-      <div>
-        <h2 className="text-2xl font-semibold">AI is analyzing your idea...</h2>
-        <p className="text-white/50">Breaking down into features, timeline and cost</p>
-      </div>
+  <div className="rounded-3xl bg-gradient-to-br from-violet-500/20 to-blue-500/10 border border-violet-500/30 p-8 mb-8 relative overflow-hidden">
+    {/* Animated background */}
+    <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-r from-transparent via-violet-500/10 to-transparent animate-pulse" 
+           style={{ animation: 'shimmer 2s infinite' }} />
     </div>
     
-    <div className="mb-6">
-      <div className="flex justify-between text-sm mb-2">
-        <span className="text-white/50">Processing</span>
-        <span className="text-violet-400 font-mono">{progress}%</span>
+    <div className="relative">
+      <div className="flex items-center gap-4 mb-6">
+        <div className="w-14 h-14 rounded-2xl bg-violet-500/20 flex items-center justify-center relative">
+          <Sparkles className="w-7 h-7 text-violet-400" />
+          <div className="absolute inset-0 rounded-2xl bg-violet-500/20 animate-ping" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-semibold">AI is analyzing your idea...</h2>
+          <p className="text-white/50">Creating your personalized project plan</p>
+        </div>
       </div>
-      <div className="h-3 bg-white/10 rounded-full overflow-hidden">
-        <div 
-          className="h-full bg-gradient-to-r from-violet-500 to-blue-500 rounded-full transition-all duration-500"
-          style={{ width: `${progress}%` }}
-        />
+      
+      {/* Progress Steps - More visual */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-3">
+          {[
+            { label: 'Analyzing', icon: Sparkles, threshold: 0 },
+            { label: 'Features', icon: Layers, threshold: 25 },
+            { label: 'Timeline', icon: Calendar, threshold: 50 },
+            { label: 'Pricing', icon: DollarSign, threshold: 75 },
+          ].map((step, i) => {
+            const Icon = step.icon;
+            const isActive = progress >= step.threshold;
+            const isComplete = progress >= step.threshold + 25;
+            return (
+              <div key={step.label} className="flex flex-col items-center">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-500 ${
+                  isComplete ? 'bg-emerald-500/20 border-emerald-500/40' :
+                  isActive ? 'bg-violet-500/30 border-violet-500/50 scale-110' :
+                  'bg-white/5 border-white/10'
+                } border`}>
+                  {isComplete ? (
+                    <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+                  ) : (
+                    <Icon className={`w-6 h-6 ${isActive ? 'text-violet-400' : 'text-white/30'}`} />
+                  )}
+                </div>
+                <span className={`text-xs mt-2 ${isActive ? 'text-white' : 'text-white/40'}`}>{step.label}</span>
+              </div>
+            );
+          })}
+        </div>
+        
+        {/* Progress bar */}
+        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-gradient-to-r from-violet-500 via-blue-500 to-cyan-500 rounded-full transition-all duration-700 ease-out"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        <div className="flex justify-between mt-2">
+          <span className="text-xs text-white/40">Processing...</span>
+          <span className="text-sm font-mono text-violet-400">{progress}%</span>
+        </div>
       </div>
-    </div>
-    
-    <div className="grid grid-cols-4 gap-4">
-      <ProcessingStep icon={<Layers className="w-4 h-4" />} label="Features" active={progress >= 20} done={progress >= 45} />
-      <ProcessingStep icon={<Calendar className="w-4 h-4" />} label="Timeline" active={progress >= 45} done={progress >= 70} />
-      <ProcessingStep icon={<DollarSign className="w-4 h-4" />} label="Cost" active={progress >= 70} done={progress >= 90} />
-      <ProcessingStep icon={<Zap className="w-4 h-4" />} label="Finalizing" active={progress >= 90} done={progress >= 100} />
+      
+      {/* What's happening */}
+      <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="flex items-center gap-2 text-white/50">
+          <div className={`w-2 h-2 rounded-full ${progress < 100 ? 'bg-violet-400 animate-pulse' : 'bg-emerald-400'}`} />
+          Breaking down into features
+        </div>
+        <div className="flex items-center gap-2 text-white/50">
+          <div className={`w-2 h-2 rounded-full ${progress >= 50 ? (progress < 100 ? 'bg-violet-400 animate-pulse' : 'bg-emerald-400') : 'bg-white/20'}`} />
+          Calculating timeline
+        </div>
+        <div className="flex items-center gap-2 text-white/50">
+          <div className={`w-2 h-2 rounded-full ${progress >= 75 ? (progress < 100 ? 'bg-violet-400 animate-pulse' : 'bg-emerald-400') : 'bg-white/20'}`} />
+          Estimating investment
+        </div>
+        <div className="flex items-center gap-2 text-white/50">
+          <div className={`w-2 h-2 rounded-full ${progress >= 90 ? (progress < 100 ? 'bg-violet-400 animate-pulse' : 'bg-emerald-400') : 'bg-white/20'}`} />
+          Preparing your plan
+        </div>
+      </div>
     </div>
   </div>
 );
@@ -361,26 +414,56 @@ const ProposalReadyView = ({ project, data, onApprove, approving }) => (
           </div>
         </Card>
 
-        {/* CTA */}
-        <div className="rounded-2xl bg-gradient-to-br from-blue-500/20 to-violet-500/10 border border-blue-500/30 p-6">
-          <h3 className="font-semibold mb-2">Ready to Start?</h3>
-          <p className="text-sm text-white/50 mb-4">
-            Approve the plan and our team will begin development immediately.
-          </p>
-          <button
-            onClick={onApprove}
-            disabled={approving}
-            className="w-full py-4 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            {approving ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <>
-                Start Building
-                <ArrowRight className="w-5 h-5" />
-              </>
-            )}
-          </button>
+        {/* CTA - More Sales */}
+        <div className="rounded-2xl bg-gradient-to-br from-blue-600/30 to-violet-600/20 border border-blue-500/40 p-6 relative overflow-hidden">
+          {/* Glow effect */}
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl" />
+          
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-3">
+              <Zap className="w-5 h-5 text-blue-400" />
+              <span className="text-sm font-semibold text-blue-400 uppercase tracking-wide">Limited Offer</span>
+            </div>
+            <h3 className="text-xl font-bold mb-2">Ready to Build Your Product?</h3>
+            <p className="text-sm text-white/60 mb-4">
+              Start now and get your first deliverables within <span className="text-white font-medium">7 days</span>.
+            </p>
+            
+            {/* Benefits */}
+            <div className="space-y-2 mb-5">
+              <div className="flex items-center gap-2 text-sm text-white/70">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <span>Dedicated development team</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-white/70">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <span>Weekly progress updates</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-white/70">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <span>Direct chat with developers</span>
+              </div>
+            </div>
+            
+            <button
+              onClick={onApprove}
+              disabled={approving}
+              className="w-full py-4 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 flex items-center justify-center gap-2 disabled:opacity-50 text-lg group"
+            >
+              {approving ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>
+                  Start Building Now
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
+            </button>
+            
+            <p className="text-xs text-white/40 text-center mt-3">
+              No upfront payment required • Cancel anytime
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -388,28 +471,57 @@ const ProposalReadyView = ({ project, data, onApprove, approving }) => (
 );
 
 const AwaitingApprovalView = ({ project }) => (
-  <div className="max-w-2xl mx-auto text-center py-16">
-    <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-500/20 to-violet-500/20 mx-auto mb-6 flex items-center justify-center">
-      <Clock className="w-10 h-10 text-blue-400" />
+  <div className="max-w-2xl mx-auto py-12">
+    {/* Success Banner */}
+    <div className="rounded-2xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/10 border border-emerald-500/30 p-8 mb-8 text-center">
+      <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 mx-auto mb-4 flex items-center justify-center">
+        <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+      </div>
+      <h2 className="text-2xl font-bold mb-2 text-emerald-400">Request Submitted!</h2>
+      <p className="text-white/60">
+        Our team has received your approval and will start working on your project.
+      </p>
     </div>
-    <h1 className="text-3xl font-semibold mb-4">Waiting for Team Confirmation</h1>
-    <p className="text-lg text-white/50 mb-8">
-      Thank you for approving the project plan! Our team is reviewing your request and will begin work shortly.
-    </p>
     
-    <div className="rounded-2xl bg-[#151922] border border-white/10 p-6 text-left mb-8">
-      <h3 className="font-semibold mb-4">What happens next:</h3>
-      <div className="space-y-3">
-        <NextStep number={1} text="Team reviews your approval" done />
-        <NextStep number={2} text="Project assigned to developers" active />
-        <NextStep number={3} text="Development begins" />
-        <NextStep number={4} text="You receive first deliverables" />
+    {/* What happens next */}
+    <div className="rounded-2xl bg-[#151922] border border-white/10 p-6 mb-8">
+      <h3 className="font-semibold mb-5 flex items-center gap-2">
+        <Clock className="w-5 h-5 text-blue-400" />
+        What happens next
+      </h3>
+      <div className="space-y-4">
+        <StepItem number={1} title="Team Assignment" description="We're assigning developers to your project" status="active" />
+        <StepItem number={2} title="Kickoff Meeting" description="Optional intro call to align on requirements" status="pending" />
+        <StepItem number={3} title="Development Begins" description="You'll see progress in your dashboard" status="pending" />
+        <StepItem number={4} title="First Deliverables" description="Expected within 5-7 business days" status="pending" />
       </div>
     </div>
     
-    <p className="text-white/40 text-sm">
-      Expected response time: within 24 hours
-    </p>
+    {/* Contact info */}
+    <div className="text-center">
+      <p className="text-white/40 text-sm mb-2">
+        Questions? Our team typically responds within 2 hours.
+      </p>
+      <button className="text-blue-400 hover:text-blue-300 text-sm font-medium">
+        Contact Support →
+      </button>
+    </div>
+  </div>
+);
+
+const StepItem = ({ number, title, description, status }) => (
+  <div className="flex items-start gap-4">
+    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
+      status === 'active' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/40 ring-4 ring-blue-500/10' :
+      status === 'done' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' :
+      'bg-white/5 text-white/30 border border-white/10'
+    }`}>
+      {status === 'done' ? <CheckCircle2 className="w-4 h-4" /> : number}
+    </div>
+    <div>
+      <h4 className={`font-medium ${status === 'active' ? 'text-white' : 'text-white/60'}`}>{title}</h4>
+      <p className="text-sm text-white/40">{description}</p>
+    </div>
   </div>
 );
 

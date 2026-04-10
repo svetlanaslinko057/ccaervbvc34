@@ -24,6 +24,7 @@ const ClientProjects = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('newest');
   const [deleteModal, setDeleteModal] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -67,14 +68,23 @@ const ClientProjects = () => {
   const allItems = [
     ...requests.map(r => ({ ...r, type: 'request', id: r.request_id, status: r.status || 'idea_submitted' })),
     ...projects.map(p => ({ ...p, type: 'project', id: p.project_id, status: mapProjectStatus(p) }))
-  ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  ];
+  
+  // Sort
+  const sortedItems = [...allItems].sort((a, b) => {
+    if (sortBy === 'newest') return new Date(b.created_at) - new Date(a.created_at);
+    if (sortBy === 'oldest') return new Date(a.created_at) - new Date(b.created_at);
+    if (sortBy === 'name') return (a.title || a.name || '').localeCompare(b.title || b.name || '');
+    return 0;
+  });
 
   // Filter
-  const filteredItems = allItems.filter(item => {
+  const filteredItems = sortedItems.filter(item => {
     const matchesSearch = item.title?.toLowerCase().includes(search.toLowerCase()) ||
                          item.name?.toLowerCase().includes(search.toLowerCase());
     const matchesFilter = filter === 'all' || 
                          (filter === 'active' && ['active', 'development', 'design'].includes(item.status)) ||
+                         (filter === 'pending' && ['idea_submitted', 'reviewing', 'proposal_ready', 'awaiting_approval', 'pending'].includes(item.status)) ||
                          (filter === 'completed' && item.status === 'completed');
     return matchesSearch && matchesFilter;
   });
@@ -96,8 +106,8 @@ const ClientProjects = () => {
       </div>
 
       {/* Search & Filters */}
-      <div className="flex gap-4 mb-6">
-        <div className="flex-1 relative">
+      <div className="flex flex-wrap gap-4 mb-6">
+        <div className="flex-1 min-w-[200px] relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
           <input
             type="text"
@@ -107,8 +117,10 @@ const ClientProjects = () => {
             className="w-full bg-[#151922] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-blue-500/50"
           />
         </div>
+        
+        {/* Filter Tabs */}
         <div className="flex bg-[#151922] border border-white/10 rounded-xl p-1">
-          {['all', 'active', 'completed'].map(f => (
+          {['all', 'pending', 'active', 'completed'].map(f => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -120,6 +132,17 @@ const ClientProjects = () => {
             </button>
           ))}
         </div>
+        
+        {/* Sort */}
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          className="bg-[#151922] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500/50 cursor-pointer"
+        >
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="name">By name</option>
+        </select>
       </div>
 
       {/* Projects List */}
