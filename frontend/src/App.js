@@ -53,6 +53,7 @@ import ClientLayout from "@/layouts/ClientLayout";
 import ClientHub from "@/pages/ClientHub";
 import ClientProjects from "@/pages/ClientProjects";
 import ClientSupport from "@/pages/ClientSupport";
+import ClientProjectPage from "@/pages/ClientProjectPage";
 
 // Provider Marketplace
 import ProviderInbox from "@/pages/ProviderInbox";
@@ -172,6 +173,7 @@ function AppRouter() {
         <Route path="dashboard" element={<ClientHub />} />
         <Route path="projects" element={<ClientProjects />} />
         <Route path="projects/:projectId" element={<ProjectDetails />} />
+        <Route path="project/:projectId" element={<ClientProjectPage />} />
         <Route path="deliverables" element={<ClientHub />} />
         <Route path="deliverable/:deliverableId" element={<ClientDeliverablePage />} />
         <Route path="support" element={<ClientSupport />} />

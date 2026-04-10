@@ -13,6 +13,9 @@ const ClientHub = () => {
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState(null);
   const [newProjectId, setNewProjectId] = useState(null);
+  
+  const MIN_CHARS = 50;
+  const isValidIdea = idea.trim().length >= MIN_CHARS;
 
   useEffect(() => {
     fetchProjects();
@@ -30,7 +33,7 @@ const ClientHub = () => {
   };
 
   const handleStartProject = async () => {
-    if (!idea.trim() || submitting) return;
+    if (!isValidIdea || submitting) return;
     setSubmitting(true);
     
     try {
@@ -40,18 +43,10 @@ const ClientHub = () => {
         business_idea: idea,
       }, { withCredentials: true });
       
-      setIdea('');
-      setNewProjectId(res.data.request_id);
-      
-      // Show success toast
-      setToast({
-        type: 'success',
-        title: 'Project Created!',
-        message: 'AI is now structuring your idea into features and timeline...'
+      // Redirect to project page immediately
+      navigate(`/client/project/${res.data.request_id}`, { 
+        state: { isNew: true, idea: idea } 
       });
-      
-      // Refresh projects
-      await fetchProjects();
     } catch (err) {
       setToast({
         type: 'error',
@@ -59,7 +54,6 @@ const ClientHub = () => {
         message: err.response?.data?.detail || 'Failed to create project. Please try again.'
       });
       setTimeout(() => setToast(null), 5000);
-    } finally {
       setSubmitting(false);
     }
   };
@@ -93,19 +87,44 @@ const ClientHub = () => {
             </p>
 
             {/* Input */}
-            <div className="relative mb-6">
+            <div className="relative mb-4">
               <textarea
                 value={idea}
                 onChange={(e) => setIdea(e.target.value)}
                 placeholder="Build me a marketplace for vintage cars where sellers can list vehicles with history, buyers can browse and make offers..."
-                className="w-full h-32 bg-[#0d1117] border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-white/30 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 resize-none text-lg transition-all"
+                className={`w-full h-32 bg-[#0d1117] border rounded-2xl px-5 py-4 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 resize-none text-lg transition-all ${
+                  idea.length > 0 && !isValidIdea 
+                    ? 'border-amber-500/50 focus:border-amber-500/50 focus:ring-amber-500/20' 
+                    : 'border-white/10 focus:border-blue-500/50 focus:ring-blue-500/20'
+                }`}
                 data-testid="idea-input"
               />
+            </div>
+            
+            {/* Character counter & validation */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                {idea.length > 0 && !isValidIdea && (
+                  <span className="text-sm text-amber-400">
+                    Minimum {MIN_CHARS} characters required
+                  </span>
+                )}
+                {isValidIdea && (
+                  <span className="text-sm text-emerald-400 flex items-center gap-1">
+                    <CheckCircle2 className="w-4 h-4" /> Ready to submit
+                  </span>
+                )}
+              </div>
+              <span className={`text-sm font-mono ${
+                idea.length >= MIN_CHARS ? 'text-emerald-400' : 'text-white/40'
+              }`}>
+                {idea.length} / {MIN_CHARS}
+              </span>
             </div>
 
             <button
               onClick={handleStartProject}
-              disabled={!idea.trim() || submitting}
+              disabled={!isValidIdea || submitting}
               className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white font-semibold rounded-xl flex items-center gap-3 transition-all shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
               data-testid="start-project-btn"
             >
