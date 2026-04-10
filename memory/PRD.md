@@ -2,8 +2,30 @@
 
 ## Project Overview
 **Tech Stack:** React + FastAPI + MongoDB + Socket.IO  
-**Last Updated:** April 9, 2026
+**Last Updated:** April 10, 2026
 **Status:** Deployed and Running
+
+---
+
+## Recent Changes (April 10, 2026)
+
+### Full Redesign of Internal Cabinets
+All internal cabinet pages (Developer & Client) have been redesigned to match the main landing page style:
+
+**Updated Pages:**
+- DeveloperHub.js - New dashboard with stats, next task card, recent activity, quick actions
+- DeveloperWorkPage.js - Complete redesign with status cards, time tracking, submission history
+- NewRequest.js - Modern form with gradient heading, example ideas, what happens next section
+- ClientHub.js - Updated dashboard matching developer style with consistent components
+
+**Design System Applied:**
+- Background: #05050A
+- Surface: #0A0A0F
+- Primary: #2563EB (blue-600)
+- Borders: white/[0.06]
+- Corners: rounded-2xl
+- Cards: glass-morphism with gradient backgrounds
+- Shadows: shadow-blue-600/20
 
 ---
 
