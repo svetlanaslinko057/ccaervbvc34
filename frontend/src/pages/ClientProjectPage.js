@@ -258,35 +258,57 @@ const ClientProjectPage = () => {
             <div className="space-y-6">
               {/* Cost Estimate */}
               <Card title="Cost Estimate" icon={<DollarSign className="w-4 h-4 text-emerald-400" />}>
-                <div className="text-center py-4">
-                  <div className="text-3xl font-bold text-white mb-1">
-                    ${generatedData.cost.min?.toLocaleString()} - ${generatedData.cost.max?.toLocaleString()}
+                <div className="space-y-4">
+                  {/* Market Average */}
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm text-white/50">Market Average</span>
+                      <span className="text-xs text-white/30">Standard rates</span>
+                    </div>
+                    <div className="text-xl font-semibold text-white/60 line-through">
+                      ${generatedData.cost.market_average?.min?.toLocaleString()} - ${generatedData.cost.market_average?.max?.toLocaleString()}
+                    </div>
                   </div>
-                  <p className="text-white/40 text-sm">{generatedData.cost.currency || 'USD'}</p>
+                  
+                  {/* Premium Quality - Highlighted */}
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/10 border border-emerald-500/30 relative">
+                    <div className="absolute -top-2 right-3 px-2 py-0.5 bg-emerald-500 text-[10px] font-bold text-white rounded-full uppercase">
+                      Recommended
+                    </div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm text-emerald-400 font-medium">Premium Quality</span>
+                      <span className="text-xs text-emerald-400/60">Best value</span>
+                    </div>
+                    <div className="text-2xl font-bold text-white">
+                      ${generatedData.cost.premium_quality?.min?.toLocaleString()} - ${generatedData.cost.premium_quality?.max?.toLocaleString()}
+                    </div>
+                  </div>
+                  
+                  {/* Optimized */}
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm text-white/50">Optimized</span>
+                      <span className="text-xs text-amber-400/60">With trade-offs</span>
+                    </div>
+                    <div className="text-xl font-semibold text-white">
+                      ${generatedData.cost.optimized?.min?.toLocaleString()} - ${generatedData.cost.optimized?.max?.toLocaleString()}
+                    </div>
+                  </div>
                 </div>
-                <div className="border-t border-white/10 pt-4 mt-4 space-y-2">
+                
+                <div className="border-t border-white/10 pt-4 mt-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-white/50">Total Hours</span>
-                    <span className="font-medium">{generatedData.cost.total_hours || generatedData.features.reduce((sum, f) => sum + f.hours, 0)}h</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-white/50">Hourly Rate</span>
-                    <span className="font-medium">${generatedData.cost.hourly_rate || 50}/h</span>
+                    <span className="text-white/50">Estimated scope</span>
+                    <span className="font-medium">{generatedData.cost.total_hours}h</span>
                   </div>
                   {generatedData.complexity && (
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-sm mt-2">
                       <span className="text-white/50">Complexity</span>
                       <span className={`font-medium capitalize ${
                         generatedData.complexity === 'high' ? 'text-red-400' :
                         generatedData.complexity === 'medium' ? 'text-amber-400' :
                         'text-emerald-400'
                       }`}>{generatedData.complexity}</span>
-                    </div>
-                  )}
-                  {generatedData.team_size && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-white/50">Team Size</span>
-                      <span className="font-medium">{generatedData.team_size}</span>
                     </div>
                   )}
                 </div>

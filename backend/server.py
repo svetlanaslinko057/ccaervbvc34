@@ -4518,15 +4518,32 @@ Respond with JSON only. Be realistic with hours - don't underestimate."""
             else:
                 raise HTTPException(status_code=500, detail="Failed to parse AI response")
         
-        # Ensure cost calculation is correct
+        # Ensure cost calculation with 3 tiers
         if 'features' in result:
             total_hours = sum(f.get('hours', 0) for f in result['features'])
-            hourly_rate = result.get('cost', {}).get('hourly_rate', 50)
+            
+            # 3 pricing tiers (rates hidden from user)
+            market_rate = 44  # Average market rate
+            premium_rate = 25  # Our premium quality rate
+            optimized_rate = 15  # Optimized with trade-offs
+            
             result['cost'] = {
                 'total_hours': total_hours,
-                'hourly_rate': hourly_rate,
-                'min': int(total_hours * hourly_rate * 0.9),
-                'max': int(total_hours * hourly_rate * 1.1),
+                'market_average': {
+                    'min': int(total_hours * market_rate * 0.9),
+                    'max': int(total_hours * market_rate * 1.1),
+                    'label': 'Market Average'
+                },
+                'premium_quality': {
+                    'min': int(total_hours * premium_rate * 0.9),
+                    'max': int(total_hours * premium_rate * 1.1),
+                    'label': 'Premium Quality'
+                },
+                'optimized': {
+                    'min': int(total_hours * optimized_rate * 0.9),
+                    'max': int(total_hours * optimized_rate * 1.1),
+                    'label': 'Optimized'
+                },
                 'currency': 'USD'
             }
         
