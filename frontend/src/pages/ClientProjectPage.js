@@ -259,15 +259,36 @@ const ClientProjectPage = () => {
               {/* Cost Estimate */}
               <Card title="Cost Estimate" icon={<DollarSign className="w-4 h-4 text-emerald-400" />}>
                 <div className="text-center py-4">
-                  <div className="text-4xl font-bold text-white mb-1">
-                    ${generatedData.cost.min.toLocaleString()} - ${generatedData.cost.max.toLocaleString()}
+                  <div className="text-3xl font-bold text-white mb-1">
+                    ${generatedData.cost.min?.toLocaleString()} - ${generatedData.cost.max?.toLocaleString()}
                   </div>
-                  <p className="text-white/40 text-sm">USD</p>
+                  <p className="text-white/40 text-sm">{generatedData.cost.currency || 'USD'}</p>
                 </div>
-                <div className="border-t border-white/10 pt-4 mt-4">
-                  <p className="text-sm text-white/50 text-center">
-                    Based on {generatedData.features.reduce((sum, f) => sum + f.hours, 0)} estimated development hours
-                  </p>
+                <div className="border-t border-white/10 pt-4 mt-4 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-white/50">Total Hours</span>
+                    <span className="font-medium">{generatedData.cost.total_hours || generatedData.features.reduce((sum, f) => sum + f.hours, 0)}h</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-white/50">Hourly Rate</span>
+                    <span className="font-medium">${generatedData.cost.hourly_rate || 50}/h</span>
+                  </div>
+                  {generatedData.complexity && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-white/50">Complexity</span>
+                      <span className={`font-medium capitalize ${
+                        generatedData.complexity === 'high' ? 'text-red-400' :
+                        generatedData.complexity === 'medium' ? 'text-amber-400' :
+                        'text-emerald-400'
+                      }`}>{generatedData.complexity}</span>
+                    </div>
+                  )}
+                  {generatedData.team_size && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-white/50">Team Size</span>
+                      <span className="font-medium">{generatedData.team_size}</span>
+                    </div>
+                  )}
                 </div>
               </Card>
 

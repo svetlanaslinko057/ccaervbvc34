@@ -4446,45 +4446,61 @@ async def analyze_project_with_ai(request: AIAnalysisRequest):
         chat = LlmChat(
             api_key=api_key,
             session_id=f"project-analysis-{request.request_id or uuid.uuid4().hex[:8]}",
-            system_message="""You are a senior software architect and project estimator. 
-Analyze the given project idea and provide a structured breakdown.
+            system_message="""You are a senior software architect and project estimator with 15+ years of experience.
+Your task is to provide DETAILED and REALISTIC project estimates.
+
+IMPORTANT ESTIMATION RULES:
+1. Be thorough - break down into ALL necessary features, not just main ones
+2. Include: authentication, admin panels, testing, deployment setup, documentation
+3. Include backend AND frontend hours separately for each feature
+4. Consider: database design, API development, UI/UX, integrations, security
+5. Typical feature hours: Simple (8-16h), Medium (20-40h), Complex (50-100h)
+6. Include buffer time (15-20%) for bug fixes and iterations
+7. A typical MVP takes 300-800 hours depending on complexity
+
 Always respond with valid JSON only, no markdown, no explanations.
 The JSON must have this exact structure:
 {
   "features": [
-    {"name": "Feature Name", "description": "Brief description", "hours": 8}
+    {"name": "Feature Name", "description": "Detailed description", "hours": 40}
   ],
   "timeline": {
     "design": "X week(s)",
-    "development": "X-Y weeks",
+    "development": "X-Y weeks", 
     "testing": "X week(s)",
     "total": "X-Y weeks"
   },
   "cost": {
-    "min": 5000,
-    "max": 10000,
-    "currency": "USD",
-    "hourly_rate": 75
-  }
+    "total_hours": 500,
+    "hourly_rate": 50,
+    "min": 22500,
+    "max": 27500,
+    "currency": "USD"
+  },
+  "complexity": "low|medium|high",
+  "team_size": "1-2 developers"
 }
-Estimate realistically based on a mid-level development team.
-Include 4-8 core features. Hours per feature: 4-24h.
-Cost calculation: total_hours * hourly_rate (use $75/hour)."""
+
+Cost calculation: 
+- min = total_hours * hourly_rate * 0.9
+- max = total_hours * hourly_rate * 1.1
+Use $50/hour as default rate."""
         ).with_model("openai", "gpt-4o")
         
         user_message = UserMessage(
-            text=f"""Analyze this project idea and provide a JSON breakdown of features, timeline, and cost:
+            text=f"""Analyze this project idea and provide a DETAILED JSON breakdown.
+Be thorough - include ALL features needed for a production-ready product.
+Consider: frontend, backend, database, auth, admin, integrations, testing, deployment.
 
 PROJECT IDEA:
 {request.idea}
 
-Respond with JSON only."""
+Respond with JSON only. Be realistic with hours - don't underestimate."""
         )
         
         response = await chat.send_message(user_message)
         
         # Parse JSON from response
-        # Clean up response - remove markdown code blocks if present
         clean_response = response.strip()
         if clean_response.startswith("```"):
             clean_response = clean_response.split("```")[1]
@@ -4495,13 +4511,24 @@ Respond with JSON only."""
         try:
             result = json.loads(clean_response)
         except json.JSONDecodeError:
-            # Try to find JSON in response
             import re
             json_match = re.search(r'\{[\s\S]*\}', response)
             if json_match:
                 result = json.loads(json_match.group())
             else:
                 raise HTTPException(status_code=500, detail="Failed to parse AI response")
+        
+        # Ensure cost calculation is correct
+        if 'features' in result:
+            total_hours = sum(f.get('hours', 0) for f in result['features'])
+            hourly_rate = result.get('cost', {}).get('hourly_rate', 50)
+            result['cost'] = {
+                'total_hours': total_hours,
+                'hourly_rate': hourly_rate,
+                'min': int(total_hours * hourly_rate * 0.9),
+                'max': int(total_hours * hourly_rate * 1.1),
+                'currency': 'USD'
+            }
         
         return result
         
