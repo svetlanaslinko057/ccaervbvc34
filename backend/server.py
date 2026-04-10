@@ -1122,6 +1122,61 @@ async def get_my_requests(user: User = Depends(get_current_user)):
     return requests
 
 
+@api_router.get("/requests/mine")
+async def get_my_requests_list(user: User = Depends(get_current_user)):
+    """Client: Get my requests (alternative endpoint)"""
+    requests = await db.requests.find({"user_id": user.user_id}, {"_id": 0}).to_list(100)
+    return requests
+
+
+@api_router.get("/requests/{request_id}")
+async def get_request(request_id: str, user: User = Depends(get_current_user)):
+    """Get single request"""
+    request = await db.requests.find_one({"request_id": request_id}, {"_id": 0})
+    if not request:
+        raise HTTPException(status_code=404, detail="Request not found")
+    return request
+
+
+@api_router.patch("/requests/{request_id}")
+async def update_request(request_id: str, data: dict, user: User = Depends(get_current_user)):
+    """Update request (status, ai_analysis, etc)"""
+    update_data = {}
+    if "status" in data:
+        update_data["status"] = data["status"]
+    if "ai_analysis" in data:
+        update_data["ai_analysis"] = data["ai_analysis"]
+    
+    if update_data:
+        result = await db.requests.update_one(
+            {"request_id": request_id},
+            {"$set": update_data}
+        )
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Request not found")
+    
+    return {"message": "Updated"}
+
+
+@api_router.delete("/requests/{request_id}")
+async def delete_request(request_id: str, user: User = Depends(get_current_user)):
+    """Delete a request (only if not active)"""
+    request = await db.requests.find_one({"request_id": request_id})
+    if not request:
+        raise HTTPException(status_code=404, detail="Request not found")
+    
+    # Check ownership
+    if user.role == "client" and request.get("user_id") != user.user_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Check if can delete
+    if request.get("status") in ["active", "delivery"]:
+        raise HTTPException(status_code=400, detail="Cannot delete active project")
+    
+    await db.requests.delete_one({"request_id": request_id})
+    return {"message": "Deleted"}
+
+
 @api_router.get("/projects/mine", response_model=List[Project])
 async def get_my_projects(user: User = Depends(get_current_user)):
     """Client: Get my projects"""

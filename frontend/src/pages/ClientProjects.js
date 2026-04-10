@@ -3,117 +3,117 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth, API } from '@/App';
 import axios from 'axios';
 import {
-  FolderKanban,
-  Plus,
-  Clock,
-  CheckCircle2,
-  ArrowUpRight,
   Search,
   ChevronRight,
-  Layers
+  Trash2,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
+  FileText,
+  Zap,
+  MoreHorizontal,
+  X
 } from 'lucide-react';
 
 const ClientProjects = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  
   const [projects, setProjects] = useState([]);
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [deleteModal, setDeleteModal] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [projectsRes, requestsRes] = await Promise.all([
-          axios.get(`${API}/projects/mine`, { withCredentials: true }),
-          axios.get(`${API}/requests`, { withCredentials: true })
-        ]);
-        setProjects(projectsRes.data);
-        setRequests(requestsRes.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, []);
 
-  const getStageProgress = (stage) => {
-    const stages = ['discovery', 'scope', 'design', 'development', 'qa', 'delivery', 'support'];
-    const index = stages.indexOf(stage);
-    return Math.round(((index + 1) / stages.length) * 100);
+  const fetchData = async () => {
+    try {
+      const [projectsRes, requestsRes] = await Promise.all([
+        axios.get(`${API}/projects/mine`, { withCredentials: true }).catch(() => ({ data: [] })),
+        axios.get(`${API}/requests/mine`, { withCredentials: true }).catch(() => ({ data: [] }))
+      ]);
+      setProjects(projectsRes.data || []);
+      setRequests(requestsRes.data || []);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const filteredProjects = projects
-    .filter(p => filter === 'all' || p.status === filter)
-    .filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+  const handleDelete = async (item, type) => {
+    setDeleting(true);
+    try {
+      if (type === 'request') {
+        await axios.delete(`${API}/requests/${item.request_id}`, { withCredentials: true });
+      } else {
+        await axios.delete(`${API}/projects/${item.project_id}`, { withCredentials: true });
+      }
+      setDeleteModal(null);
+      fetchData();
+    } catch (error) {
+      alert(error.response?.data?.detail || 'Failed to delete');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
-  const pendingRequests = requests.filter(r => r.status === 'pending');
+  // Combine projects and requests
+  const allItems = [
+    ...requests.map(r => ({ ...r, type: 'request', id: r.request_id, status: r.status || 'idea_submitted' })),
+    ...projects.map(p => ({ ...p, type: 'project', id: p.project_id, status: mapProjectStatus(p) }))
+  ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  // Filter
+  const filteredItems = allItems.filter(item => {
+    const matchesSearch = item.title?.toLowerCase().includes(search.toLowerCase()) ||
+                         item.name?.toLowerCase().includes(search.toLowerCase());
+    const matchesFilter = filter === 'all' || 
+                         (filter === 'active' && ['active', 'development', 'design'].includes(item.status)) ||
+                         (filter === 'completed' && item.status === 'completed');
+    return matchesSearch && matchesFilter;
+  });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="w-8 h-8 border-2 border-white/10 border-t-blue-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen p-8" data-testid="client-projects">
-      {/* Background */}
-      <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none" />
-      
+    <div className="min-h-screen p-8 max-w-5xl mx-auto" data-testid="client-projects">
       {/* Header */}
-      <div className="relative flex items-center justify-between mb-10">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Projects</h1>
-          <p className="text-white/40 mt-2">Manage and track your active projects</p>
-        </div>
-        <button
-          onClick={() => navigate('/client/request/new')}
-          className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-all shadow-lg shadow-blue-600/20"
-          data-testid="new-project-btn"
-        >
-          <Plus className="w-4 h-4" />
-          New Project
-        </button>
+      <div className="mb-8">
+        <h1 className="text-3xl font-semibold tracking-tight mb-2">Your Projects</h1>
+        <p className="text-white/50">{allItems.length} total projects</p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        <StatCard 
-          label="Active" 
-          value={projects.filter(p => p.status === 'active').length}
-          color="blue"
-        />
-        <StatCard 
-          label="Completed" 
-          value={projects.filter(p => p.status === 'completed').length}
-          color="emerald"
-        />
-        <StatCard 
-          label="Pending" 
-          value={pendingRequests.length}
-          color="amber"
-        />
-      </div>
-
-      {/* Search & Filter */}
-      <div className="flex items-center gap-4 mb-8">
+      {/* Search & Filters */}
+      <div className="flex gap-4 mb-6">
         <div className="flex-1 relative">
-          <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search projects..."
-            className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3.5 text-white placeholder:text-white/30 focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.07] transition-all"
+            className="w-full bg-[#151922] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-blue-500/50"
           />
         </div>
-        <div className="flex gap-2 p-1 bg-white/5 rounded-xl border border-white/5">
-          {['all', 'active', 'completed'].map((f) => (
+        <div className="flex bg-[#151922] border border-white/10 rounded-xl p-1">
+          {['all', 'active', 'completed'].map(f => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-5 py-2.5 rounded-lg text-sm capitalize transition-all ${
-                filter === f
-                  ? 'bg-blue-600 text-white font-medium shadow-lg shadow-blue-600/20'
-                  : 'text-white/50 hover:text-white'
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
+                filter === f ? 'bg-blue-600 text-white' : 'text-white/50 hover:text-white'
               }`}
             >
               {f}
@@ -122,61 +122,65 @@ const ClientProjects = () => {
         </div>
       </div>
 
-      {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="w-8 h-8 border-2 border-white/10 border-t-blue-500 rounded-full animate-spin" />
-        </div>
-      ) : filteredProjects.length === 0 && pendingRequests.length === 0 ? (
-        <div className="rounded-2xl border border-white/10 bg-[#151922] p-16 text-center">
-          <div className="w-20 h-20 rounded-2xl bg-white/5 mx-auto mb-6 flex items-center justify-center">
-            <FolderKanban className="w-10 h-10 text-white/20" />
+      {/* Projects List */}
+      {filteredItems.length === 0 ? (
+        <div className="rounded-2xl bg-[#151922] border border-white/10 p-12 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-white/5 mx-auto mb-4 flex items-center justify-center">
+            <FileText className="w-8 h-8 text-white/20" />
           </div>
-          <h3 className="text-xl font-semibold mb-2">No projects yet</h3>
-          <p className="text-white/40 mb-8 max-w-md mx-auto">Start by creating your first project request. We'll help you scope and build it.</p>
+          <h3 className="text-lg font-semibold mb-2">No projects found</h3>
+          <p className="text-white/50 mb-6">Start building your first product</p>
           <button
-            onClick={() => navigate('/client/request/new')}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-all shadow-lg shadow-blue-600/20"
+            onClick={() => navigate('/client/dashboard')}
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-all"
           >
-            <Plus className="w-4 h-4" />
-            Create Your First Project
+            Create Project
           </button>
         </div>
       ) : (
-        <div className="space-y-4">
-          {/* Pending Requests */}
-          {filter === 'all' && pendingRequests.map((request) => (
-            <div
-              key={request.request_id}
-              className="rounded-2xl border border-amber-500/20 bg-gradient-to-r from-amber-500/10 to-transparent p-6"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="flex items-center gap-3 mb-3">
-                    <h3 className="font-semibold text-lg">{request.title}</h3>
-                    <span className="px-3 py-1 text-xs bg-amber-500/20 text-amber-400 rounded-lg border border-amber-500/20">
-                      Processing
-                    </span>
-                  </div>
-                  <p className="text-white/50 text-sm line-clamp-2">{request.business_idea}</p>
-                </div>
+        <div className="space-y-3">
+          {filteredItems.map(item => (
+            <ProjectCard
+              key={item.id}
+              item={item}
+              onOpen={() => navigate(`/client/project/${item.id}`)}
+              onDelete={() => setDeleteModal(item)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      {deleteModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-[#151922] border border-white/10 rounded-2xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center">
+                <Trash2 className="w-6 h-6 text-red-400" />
               </div>
-              <div className="mt-4 flex items-center gap-2 text-amber-400/70 text-sm">
-                <Clock className="w-4 h-4" />
-                <span>Our team is reviewing your request</span>
+              <div>
+                <h3 className="text-lg font-semibold">Delete Project?</h3>
+                <p className="text-sm text-white/50">This action cannot be undone</p>
               </div>
             </div>
-          ))}
-
-          {/* Projects Grid */}
-          <div className="grid gap-4">
-            {filteredProjects.map((project) => (
-              <ProjectCard 
-                key={project.project_id}
-                project={project}
-                progress={getStageProgress(project.current_stage)}
-                onClick={() => navigate(`/client/projects/${project.project_id}`)}
-              />
-            ))}
+            <p className="text-white/60 mb-6">
+              Are you sure you want to delete "<span className="text-white font-medium">{deleteModal.title || deleteModal.name}</span>"?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteModal(null)}
+                className="flex-1 py-3 border border-white/10 rounded-xl text-white/70 hover:text-white hover:border-white/20 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deleteModal, deleteModal.type)}
+                disabled={deleting}
+                className="flex-1 py-3 bg-red-500 hover:bg-red-400 text-white rounded-xl font-medium transition-all disabled:opacity-50"
+              >
+                {deleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -184,67 +188,130 @@ const ClientProjects = () => {
   );
 };
 
-// Stat Card
-const StatCard = ({ label, value, color }) => {
-  const colors = {
-    blue: 'text-blue-400',
-    emerald: 'text-emerald-400',
-    amber: 'text-amber-400'
+const mapProjectStatus = (project) => {
+  const stage = project.current_stage || project.status;
+  const mapping = {
+    'pending': 'idea_submitted',
+    'discovery': 'reviewing',
+    'scope': 'proposal_ready',
+    'design': 'active',
+    'development': 'active',
+    'qa': 'delivery',
+    'delivery': 'delivery',
+    'completed': 'completed',
+    'active': 'active'
   };
+  return mapping[stage] || stage;
+};
+
+const ProjectCard = ({ item, onOpen, onDelete }) => {
+  const [showActions, setShowActions] = useState(false);
+  const status = item.status;
   
+  const statusConfig = {
+    idea_submitted: { 
+      label: 'Submitted', 
+      color: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+      icon: Clock,
+      message: 'Your idea is being reviewed'
+    },
+    pending: { 
+      label: 'Submitted', 
+      color: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+      icon: Clock,
+      message: 'Your idea is being reviewed'
+    },
+    reviewing: { 
+      label: 'Reviewing', 
+      color: 'bg-violet-500/20 text-violet-400 border-violet-500/30',
+      icon: Sparkles,
+      message: 'We are analyzing your request'
+    },
+    proposal_ready: { 
+      label: 'Proposal Ready', 
+      color: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+      icon: FileText,
+      message: 'Your project plan is ready'
+    },
+    awaiting_approval: { 
+      label: 'Awaiting Approval', 
+      color: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
+      icon: Clock,
+      message: 'Waiting for your approval to start'
+    },
+    active: { 
+      label: 'Active', 
+      color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+      icon: Zap,
+      message: 'Development in progress'
+    },
+    delivery: { 
+      label: 'Delivery', 
+      color: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+      icon: FileText,
+      message: 'Deliverables ready for review'
+    },
+    completed: { 
+      label: 'Completed', 
+      color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+      icon: CheckCircle2,
+      message: 'Project completed'
+    },
+  }[status] || { 
+    label: status, 
+    color: 'bg-white/10 text-white/50 border-white/10',
+    icon: Clock,
+    message: 'Processing'
+  };
+
+  const StatusIcon = statusConfig.icon;
+  const canDelete = !['active', 'delivery'].includes(status);
+
   return (
-    <div className="p-5 rounded-2xl border border-white/10 bg-[#151922]">
-      <div className="text-xs font-medium text-white/40 uppercase tracking-wide mb-2">{label}</div>
-      <div className={`text-3xl font-semibold ${colors[color]}`}>{value}</div>
+    <div 
+      className="group rounded-2xl bg-[#151922] border border-white/10 p-5 hover:border-white/20 transition-all relative"
+      onMouseEnter={() => setShowActions(true)}
+      onMouseLeave={() => setShowActions(false)}
+    >
+      <div className="flex items-start justify-between">
+        <div className="flex-1 min-w-0 cursor-pointer" onClick={onOpen}>
+          <div className="flex items-center gap-3 mb-2">
+            <h3 className="text-lg font-semibold truncate group-hover:text-blue-400 transition-colors">
+              {item.title || item.name}
+            </h3>
+            <span className={`px-2.5 py-1 text-xs font-medium rounded-lg border ${statusConfig.color}`}>
+              {statusConfig.label}
+            </span>
+          </div>
+          <p className="text-white/50 text-sm mb-3 line-clamp-1">
+            {item.description || item.business_idea}
+          </p>
+          <div className="flex items-center gap-2 text-sm">
+            <StatusIcon className="w-4 h-4 text-white/40" />
+            <span className="text-white/40">{statusConfig.message}</span>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className={`flex items-center gap-2 transition-opacity ${showActions ? 'opacity-100' : 'opacity-0'}`}>
+          <button
+            onClick={onOpen}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition-all"
+          >
+            Open
+          </button>
+          {canDelete && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onDelete(); }}
+              className="p-2 text-white/40 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
-
-// Project Card
-const ProjectCard = ({ project, progress, onClick }) => (
-  <button
-    onClick={onClick}
-    className="w-full text-left p-6 rounded-2xl border border-white/10 bg-[#151922] hover:border-blue-500/30 hover:bg-[#0D0D14] transition-all group"
-    data-testid={`project-card-${project.project_id}`}
-  >
-    <div className="flex items-start justify-between mb-4">
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-blue-500/20 flex items-center justify-center">
-          <Layers className="w-5 h-5 text-blue-400" />
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold group-hover:text-blue-400 transition-colors">
-            {project.name}
-          </h3>
-          <p className="text-white/40 text-sm capitalize">Stage: {project.current_stage}</p>
-        </div>
-      </div>
-      <div className="flex items-center gap-3">
-        <span className={`px-3 py-1.5 text-xs rounded-lg border ${
-          project.status === 'active' 
-            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
-            : project.status === 'completed'
-            ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-            : 'bg-white/5 text-white/50 border-white/10'
-        }`}>
-          {project.status}
-        </span>
-        <ChevronRight className="w-5 h-5 text-white/20 group-hover:text-blue-400 transition-colors" />
-      </div>
-    </div>
-    
-    <div className="flex items-center gap-4">
-      <div className="flex-1">
-        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full transition-all"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
-      <span className="text-sm text-white/50 font-medium">{progress}%</span>
-    </div>
-  </button>
-);
 
 export default ClientProjects;
