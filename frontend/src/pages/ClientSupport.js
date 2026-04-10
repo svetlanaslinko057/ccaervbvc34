@@ -141,7 +141,7 @@ const ClientSupport = () => {
           <div className="w-8 h-8 border-2 border-white/10 border-t-blue-500 rounded-full animate-spin" />
         </div>
       ) : filteredTickets.length === 0 ? (
-        <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] p-16 text-center">
+        <div className="rounded-2xl border border-white/10 bg-[#1A1A23] p-16 text-center">
           <div className="w-20 h-20 rounded-2xl bg-white/5 mx-auto mb-6 flex items-center justify-center">
             <LifeBuoy className="w-10 h-10 text-white/20" />
           </div>
@@ -173,8 +173,8 @@ const ClientSupport = () => {
       {/* Create Ticket Modal */}
       {showCreate && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-[#0D0D14] border border-white/[0.06] rounded-2xl">
-            <div className="flex items-center justify-between p-6 border-b border-white/[0.06]">
+          <div className="w-full max-w-lg bg-[#0D0D14] border border-white/10 rounded-2xl">
+            <div className="flex items-center justify-between p-6 border-b border-white/10">
               <h2 className="text-xl font-semibold">New Support Ticket</h2>
               <button onClick={() => setShowCreate(false)} className="text-white/30 hover:text-white transition-colors p-2 hover:bg-white/5 rounded-lg">
                 <X className="w-5 h-5" />
@@ -199,7 +199,7 @@ const ClientSupport = () => {
                           ? type.color === 'red' ? 'border-red-500/30 bg-red-500/10' :
                             type.color === 'blue' ? 'border-blue-500/30 bg-blue-500/10' :
                             'border-white/20 bg-white/5'
-                          : 'border-white/[0.06] hover:border-white/20 bg-[#0A0A0F]'
+                          : 'border-white/10 hover:border-white/20 bg-[#1A1A23]'
                       }`}
                     >
                       <type.icon className={`w-6 h-6 mx-auto mb-2 ${
@@ -269,7 +269,7 @@ const ClientSupport = () => {
                           ? p === 'high' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
                             p === 'medium' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
                             'bg-white/10 text-white border border-white/20'
-                          : 'border border-white/[0.06] text-white/50 hover:border-white/20 bg-[#0A0A0F]'
+                          : 'border border-white/10 text-white/50 hover:border-white/20 bg-[#1A1A23]'
                       }`}
                     >
                       {p}
@@ -279,7 +279,7 @@ const ClientSupport = () => {
               </div>
             </div>
 
-            <div className="p-6 border-t border-white/[0.06] flex gap-3">
+            <div className="p-6 border-t border-white/10 flex gap-3">
               <button
                 onClick={() => setShowCreate(false)}
                 className="flex-1 py-3.5 border border-white/10 rounded-xl text-white/60 hover:text-white hover:border-white/20 transition-all"
@@ -312,8 +312,8 @@ const StatCard = ({ label, value, icon, color, highlight }) => {
   };
   
   return (
-    <div className={`p-5 rounded-2xl border bg-[#0A0A0F] transition-all ${
-      highlight ? 'border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-transparent' : 'border-white/[0.06]'
+    <div className={`p-5 rounded-2xl border bg-[#1A1A23] transition-all ${
+      highlight ? 'border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-transparent' : 'border-white/10'
     }`}>
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs font-medium text-white/40 tracking-wide uppercase">{label}</span>
@@ -345,7 +345,7 @@ const TicketCard = ({ ticket, TypeIcon }) => {
 
   return (
     <div
-      className="p-5 rounded-2xl border border-white/[0.06] bg-[#0A0A0F] hover:border-blue-500/30 hover:bg-[#0D0D14] transition-all cursor-pointer group"
+      className="p-5 rounded-2xl border border-white/10 bg-[#1A1A23] hover:border-blue-500/30 hover:bg-[#0D0D14] transition-all cursor-pointer group"
       data-testid={`ticket-${ticket.ticket_id}`}
     >
       <div className="flex items-start justify-between">

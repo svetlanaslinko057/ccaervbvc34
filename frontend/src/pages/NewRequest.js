@@ -42,7 +42,7 @@ const NewRequest = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#05050A] text-white p-8" data-testid="new-request-page">
+    <div className="min-h-screen bg-[#0D0D12] text-white p-8" data-testid="new-request-page">
       {/* Background */}
       <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none" />
       <div className="fixed bottom-0 left-0 w-[400px] h-[400px] bg-purple-600/5 rounded-full blur-[150px] pointer-events-none" />
@@ -128,7 +128,7 @@ const NewRequest = () => {
                 <button
                   key={i}
                   onClick={() => setInput(example.text)}
-                  className="w-full text-left p-5 rounded-2xl border border-white/[0.06] bg-[#0A0A0F] hover:border-blue-500/30 hover:bg-[#0D0D14] transition-all group flex items-center gap-4"
+                  className="w-full text-left p-5 rounded-2xl border border-white/10 bg-[#1A1A23] hover:border-blue-500/30 hover:bg-[#0D0D14] transition-all group flex items-center gap-4"
                 >
                   <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-blue-500/10 transition-colors">
                     <Icon className="w-5 h-5 text-white/40 group-hover:text-blue-400 transition-colors" />
@@ -141,7 +141,7 @@ const NewRequest = () => {
         </div>
 
         {/* What Happens Next */}
-        <div className="mt-16 rounded-2xl border border-white/[0.06] bg-[#0A0A0F] p-6">
+        <div className="mt-16 rounded-2xl border border-white/10 bg-[#1A1A23] p-6">
           <h3 className="font-semibold mb-4 flex items-center gap-2">
             <ArrowRight className="w-4 h-4 text-blue-400" />
             What Happens Next

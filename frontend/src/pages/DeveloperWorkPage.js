@@ -483,9 +483,9 @@ const Card = ({ title, children, icon, badge, variant }) => {
     <div className={`rounded-2xl border overflow-hidden ${
       variant === 'submit' 
         ? 'border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-transparent' 
-        : 'border-white/[0.06] bg-[#0A0A0F]'
+        : 'border-white/10 bg-[#1A1A23]'
     }`}>
-      <div className="px-5 py-4 border-b border-white/[0.06] bg-white/[0.02] flex items-center justify-between">
+      <div className="px-5 py-4 border-b border-white/10 bg-white/[0.03] flex items-center justify-between">
         <div className="flex items-center gap-2">
           {icon}
           <span className="text-xs font-medium text-white/50 uppercase tracking-wide">{title}</span>

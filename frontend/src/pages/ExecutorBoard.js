@@ -181,7 +181,7 @@ const ExecutorBoard = () => {
       <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none" />
       
       {/* Header */}
-      <div className="p-8 border-b border-white/[0.06]">
+      <div className="p-8 border-b border-white/10">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">Work Board</h1>
@@ -239,8 +239,8 @@ const ExecutorBoard = () => {
       {/* Submission Modal */}
       {submissionModal.open && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-[#0D0D14] border border-white/[0.06] rounded-2xl" data-testid="submission-modal">
-            <div className="p-6 border-b border-white/[0.06] flex items-center justify-between">
+          <div className="w-full max-w-lg bg-[#0D0D14] border border-white/10 rounded-2xl" data-testid="submission-modal">
+            <div className="p-6 border-b border-white/10 flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold">Submit for Review</h2>
                 <p className="text-sm text-white/40">Describe completed work</p>
@@ -282,7 +282,7 @@ const ExecutorBoard = () => {
               </div>
             </div>
 
-            <div className="p-6 border-t border-white/[0.06] flex gap-3">
+            <div className="p-6 border-t border-white/10 flex gap-3">
               <button
                 onClick={() => {
                   setSubmissionModal({ open: false, unitId: null });
@@ -319,8 +319,8 @@ const StatCard = ({ label, value, color, highlight }) => {
   };
   
   return (
-    <div className={`p-5 rounded-2xl border bg-[#0A0A0F] transition-all ${
-      highlight ? 'border-red-500/30 bg-gradient-to-br from-red-500/10 to-transparent' : 'border-white/[0.06]'
+    <div className={`p-5 rounded-2xl border bg-[#1A1A23] transition-all ${
+      highlight ? 'border-red-500/30 bg-gradient-to-br from-red-500/10 to-transparent' : 'border-white/10'
     }`}>
       <div className="text-3xl font-semibold text-white mb-1">{value}</div>
       <div className={`text-sm ${colors[color]}`}>{label}</div>
@@ -342,10 +342,10 @@ const BoardColumn = ({ column, units, onOpenUnit, onStartWork }) => {
   return (
     <div
       ref={setNodeRef}
-      className={`w-[300px] rounded-2xl border bg-[#0A0A0F] flex flex-col ${colors[column.color]}`}
+      className={`w-[300px] rounded-2xl border bg-[#1A1A23] flex flex-col ${colors[column.color]}`}
       data-testid={`column-${column.id}`}
     >
-      <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
+      <div className="p-4 border-b border-white/10 flex items-center justify-between">
         <span className="font-medium">{column.title}</span>
         <span className="text-xs px-2 py-1 bg-white/5 rounded-lg text-white/50">{units.length}</span>
       </div>
@@ -394,7 +394,7 @@ const TaskCard = ({ unit, onOpen, onStart, isDragging }) => {
       className={`p-4 rounded-xl border bg-[#0D0D14] transition-all cursor-grab active:cursor-grabbing ${
         isDragging ? 'border-blue-500/30 shadow-xl' : 
         isRevision ? 'border-red-500/30' : 
-        'border-white/[0.06] hover:border-blue-500/30'
+        'border-white/10 hover:border-blue-500/30'
       }`}
       data-testid={`task-${unit.unit_id}`}
     >

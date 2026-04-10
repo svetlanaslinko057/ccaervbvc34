@@ -38,16 +38,16 @@ const DeveloperLayout = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#05050A] text-white flex" data-testid="developer-layout">
+    <div className="min-h-screen bg-[#0D0D12] text-white flex" data-testid="developer-layout">
       {/* Realtime Bridge */}
       {user?.user_id && (
         <ExecutorRealtimeBridge userId={user.user_id} onRefresh={handleRefresh} />
       )}
       
       {/* Sidebar */}
-      <aside className="w-[260px] border-r border-white/[0.06] flex flex-col sticky top-0 h-screen bg-[#08080D]">
+      <aside className="w-[260px] border-r border-white/10 flex flex-col sticky top-0 h-screen bg-[#16161D]">
         {/* Logo */}
-        <div className="h-16 border-b border-white/[0.06] px-5 flex items-center gap-3">
+        <div className="h-16 border-b border-white/10 px-5 flex items-center gap-3">
           <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
             <span className="text-white font-bold text-sm">D</span>
           </div>
@@ -82,8 +82,8 @@ const DeveloperLayout = () => {
         </nav>
 
         {/* User */}
-        <div className="p-4 border-t border-white/[0.06]">
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+        <div className="p-4 border-t border-white/10">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.05] border border-white/10">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 flex items-center justify-center border border-blue-500/20">
               <Code2 className="w-4 h-4 text-blue-400" />
             </div>
@@ -103,7 +103,7 @@ const DeveloperLayout = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 min-h-screen overflow-auto bg-[#05050A]">
+      <main className="flex-1 min-h-screen overflow-auto bg-[#0D0D12]">
         <Outlet />
       </main>
     </div>

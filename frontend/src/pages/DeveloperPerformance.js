@@ -65,7 +65,7 @@ const DeveloperPerformance = () => {
       </div>
 
       {/* Profile Card */}
-      <div className="rounded-2xl border border-white/[0.06] bg-gradient-to-br from-blue-600/10 to-transparent p-8 mb-8">
+      <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-blue-600/10 to-transparent p-8 mb-8">
         <div className="flex items-start gap-6">
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
             <span className="text-3xl font-bold text-white">
@@ -119,7 +119,7 @@ const DeveloperPerformance = () => {
       </div>
 
       {/* Total Hours Block */}
-      <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] p-8 mb-8">
+      <div className="rounded-2xl border border-white/10 bg-[#1A1A23] p-8 mb-8">
         <div className="flex items-center justify-between">
           <div>
             <div className="text-xs font-medium text-white/40 uppercase tracking-wide mb-2">Total Hours Logged</div>
@@ -146,8 +146,8 @@ const DeveloperPerformance = () => {
       </div>
 
       {/* Recent Completed */}
-      <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] overflow-hidden">
-        <div className="px-6 py-5 border-b border-white/[0.06] flex items-center gap-3">
+      <div className="rounded-2xl border border-white/10 bg-[#1A1A23] overflow-hidden">
+        <div className="px-6 py-5 border-b border-white/10 flex items-center gap-3">
           <CheckCircle2 className="w-5 h-5 text-emerald-400" />
           <h2 className="font-semibold">Recently Completed</h2>
         </div>
@@ -166,7 +166,7 @@ const DeveloperPerformance = () => {
               {completedUnits.slice(0, 10).map((unit) => (
                 <div 
                   key={unit.unit_id}
-                  className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] flex items-center justify-between hover:bg-white/[0.04] transition-all"
+                  className="p-4 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between hover:bg-white/[0.04] transition-all"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
@@ -197,8 +197,8 @@ const StatCard = ({ label, value, icon, color, highlight }) => {
   };
   
   return (
-    <div className={`p-5 rounded-2xl border bg-[#0A0A0F] transition-all ${
-      highlight ? 'border-red-500/30 bg-gradient-to-br from-red-500/10 to-transparent' : 'border-white/[0.06]'
+    <div className={`p-5 rounded-2xl border bg-[#1A1A23] transition-all ${
+      highlight ? 'border-red-500/30 bg-gradient-to-br from-red-500/10 to-transparent' : 'border-white/10'
     }`}>
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs font-medium text-white/40 uppercase tracking-wide">{label}</span>

@@ -131,8 +131,8 @@ const DeveloperHub = () => {
         <div className="lg:col-span-2 space-y-6">
           {/* Next Task Card */}
           {nextTask ? (
-            <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] overflow-hidden">
-              <div className="p-5 border-b border-white/[0.06] bg-white/[0.02]">
+            <div className="rounded-2xl border border-white/10 bg-[#1A1A23] overflow-hidden">
+              <div className="p-5 border-b border-white/10 bg-white/[0.03]">
                 <div className="flex items-center gap-2">
                   <Zap className="w-4 h-4 text-blue-400" />
                   <span className="text-xs font-medium text-white/40 uppercase tracking-wide">
@@ -189,7 +189,7 @@ const DeveloperHub = () => {
               </div>
             </div>
           ) : (
-            <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] p-12 text-center">
+            <div className="rounded-2xl border border-white/10 bg-[#1A1A23] p-12 text-center">
               <div className="w-16 h-16 rounded-2xl bg-white/5 mx-auto mb-4 flex items-center justify-center">
                 <CheckCircle2 className="w-8 h-8 text-white/20" />
               </div>
@@ -205,8 +205,8 @@ const DeveloperHub = () => {
           )}
 
           {/* Recent Activity */}
-          <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] overflow-hidden">
-            <div className="p-5 border-b border-white/[0.06] bg-white/[0.02]">
+          <div className="rounded-2xl border border-white/10 bg-[#1A1A23] overflow-hidden">
+            <div className="p-5 border-b border-white/10 bg-white/[0.03]">
               <h2 className="font-semibold">Recent Activity</h2>
             </div>
             {recentActivity.length === 0 ? (
@@ -214,7 +214,7 @@ const DeveloperHub = () => {
                 <p className="text-white/40">No recent activity</p>
               </div>
             ) : (
-              <div className="divide-y divide-white/[0.06]">
+              <div className="divide-y divide-white/10">
                 {recentActivity.map((unit) => (
                   <button 
                     key={unit.unit_id}
@@ -259,7 +259,7 @@ const DeveloperHub = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] p-5">
+          <div className="rounded-2xl border border-white/10 bg-[#1A1A23] p-5">
             <h3 className="font-semibold mb-4">Quick Actions</h3>
             <div className="space-y-2">
               <ActionButton 
@@ -281,7 +281,7 @@ const DeveloperHub = () => {
           </div>
 
           {/* User Info */}
-          <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] p-5">
+          <div className="rounded-2xl border border-white/10 bg-[#1A1A23] p-5">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
                 <span className="text-lg font-bold text-white">
@@ -309,11 +309,11 @@ const StatCard = ({ label, value, icon, color, highlight }) => {
   };
   
   return (
-    <div className={`p-5 rounded-2xl border bg-[#0A0A0F] transition-all ${
-      highlight ? 'border-red-500/30 bg-gradient-to-br from-red-500/10 to-transparent' : 'border-white/[0.06]'
+    <div className={`p-5 rounded-2xl border bg-[#1A1A23] transition-all ${
+      highlight ? 'border-red-500/40 bg-gradient-to-br from-red-500/15 to-[#1A1A23]' : 'border-white/10'
     }`}>
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-medium text-white/40 uppercase tracking-wide">{label}</span>
+        <span className="text-xs font-medium text-white/50 uppercase tracking-wide">{label}</span>
         <span className={colors[color]}>{icon}</span>
       </div>
       <div className="text-3xl font-semibold text-white">{value}</div>
@@ -324,9 +324,9 @@ const StatCard = ({ label, value, icon, color, highlight }) => {
 const ActionButton = ({ icon, label, onClick }) => (
   <button
     onClick={onClick}
-    className="w-full p-3 border border-white/[0.06] rounded-xl flex items-center gap-3 text-sm hover:bg-white/[0.02] hover:border-white/10 transition-all"
+    className="w-full p-3 border border-white/10 rounded-xl flex items-center gap-3 text-sm hover:bg-white/[0.05] hover:border-white/20 transition-all"
   >
-    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/50">
+    <div className="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-white/60">
       {icon}
     </div>
     {label}

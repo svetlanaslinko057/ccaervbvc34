@@ -127,7 +127,7 @@ const ClientProjects = () => {
           <div className="w-8 h-8 border-2 border-white/10 border-t-blue-500 rounded-full animate-spin" />
         </div>
       ) : filteredProjects.length === 0 && pendingRequests.length === 0 ? (
-        <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] p-16 text-center">
+        <div className="rounded-2xl border border-white/10 bg-[#1A1A23] p-16 text-center">
           <div className="w-20 h-20 rounded-2xl bg-white/5 mx-auto mb-6 flex items-center justify-center">
             <FolderKanban className="w-10 h-10 text-white/20" />
           </div>
@@ -193,7 +193,7 @@ const StatCard = ({ label, value, color }) => {
   };
   
   return (
-    <div className="p-5 rounded-2xl border border-white/[0.06] bg-[#0A0A0F]">
+    <div className="p-5 rounded-2xl border border-white/10 bg-[#1A1A23]">
       <div className="text-xs font-medium text-white/40 uppercase tracking-wide mb-2">{label}</div>
       <div className={`text-3xl font-semibold ${colors[color]}`}>{value}</div>
     </div>
@@ -204,7 +204,7 @@ const StatCard = ({ label, value, color }) => {
 const ProjectCard = ({ project, progress, onClick }) => (
   <button
     onClick={onClick}
-    className="w-full text-left p-6 rounded-2xl border border-white/[0.06] bg-[#0A0A0F] hover:border-blue-500/30 hover:bg-[#0D0D14] transition-all group"
+    className="w-full text-left p-6 rounded-2xl border border-white/10 bg-[#1A1A23] hover:border-blue-500/30 hover:bg-[#0D0D14] transition-all group"
     data-testid={`project-card-${project.project_id}`}
   >
     <div className="flex items-start justify-between mb-4">

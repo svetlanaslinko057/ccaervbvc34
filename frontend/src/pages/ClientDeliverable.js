@@ -173,7 +173,7 @@ const ClientDeliverable = () => {
           </div>
 
           {/* Description */}
-          <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] p-6">
+          <div className="rounded-2xl border border-white/10 bg-[#1A1A23] p-6">
             <h2 className="text-xs font-medium text-white/40 uppercase tracking-wide mb-4">Description</h2>
             <p className="text-white/70 leading-relaxed">
               {deliverable.description || 'No description provided'}
@@ -182,7 +182,7 @@ const ClientDeliverable = () => {
 
           {/* Resources */}
           {deliverable.links?.length > 0 && (
-            <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] p-6">
+            <div className="rounded-2xl border border-white/10 bg-[#1A1A23] p-6">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <FileText className="w-5 h-5 text-blue-400" />
                 Resources
@@ -194,7 +194,7 @@ const ClientDeliverable = () => {
                     href={link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-4 p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:border-blue-500/30 hover:bg-white/[0.04] transition-all group"
+                    className="flex items-center gap-4 p-4 rounded-xl border border-white/10 bg-white/[0.02] hover:border-blue-500/30 hover:bg-white/[0.04] transition-all group"
                   >
                     <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
                       {link.includes('github') ? <GitBranch className="w-5 h-5 text-blue-400" /> :
@@ -211,7 +211,7 @@ const ClientDeliverable = () => {
 
           {/* Feedback */}
           {deliverable.client_feedback && (
-            <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] p-6">
+            <div className="rounded-2xl border border-white/10 bg-[#1A1A23] p-6">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <MessageSquare className="w-5 h-5 text-white/40" />
                 Your Feedback
@@ -277,7 +277,7 @@ const ClientDeliverable = () => {
           )}
 
           {/* Info */}
-          <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] p-6">
+          <div className="rounded-2xl border border-white/10 bg-[#1A1A23] p-6">
             <h3 className="font-semibold mb-4">Details</h3>
             <div className="space-y-4 text-sm">
               <div className="flex justify-between">
@@ -302,7 +302,7 @@ const ClientDeliverable = () => {
           </div>
 
           {/* Support */}
-          <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] p-6">
+          <div className="rounded-2xl border border-white/10 bg-[#1A1A23] p-6">
             <h3 className="font-semibold mb-3">Need Help?</h3>
             <p className="text-white/40 text-sm mb-4">
               Questions about this deliverable?

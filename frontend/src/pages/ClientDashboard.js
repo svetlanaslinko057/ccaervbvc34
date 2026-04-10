@@ -136,7 +136,7 @@ const ClientDashboard = () => {
                   <button
                     key={dlv.deliverable_id}
                     onClick={() => navigate(`/client/deliverable/${dlv.deliverable_id}`)}
-                    className="w-full flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-amber-500/30 hover:bg-white/[0.05] transition-all group"
+                    className="w-full flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/10 hover:border-amber-500/30 hover:bg-white/[0.05] transition-all group"
                   >
                     <div className="flex items-center gap-3">
                       <Package className="w-4 h-4 text-amber-400" />
@@ -153,8 +153,8 @@ const ClientDashboard = () => {
           )}
 
           {/* Active Projects */}
-          <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] overflow-hidden">
-            <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between">
+          <div className="rounded-2xl border border-white/10 bg-[#1A1A23] overflow-hidden">
+            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <FolderKanban className="w-5 h-5 text-blue-400" />
                 <h2 className="font-semibold">Active Projects</h2>
@@ -219,8 +219,8 @@ const ClientDashboard = () => {
         {/* Sidebar */}
         <div className="col-span-4 space-y-6">
           {/* Support */}
-          <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] overflow-hidden">
-            <div className="px-5 py-4 border-b border-white/[0.06] flex items-center gap-3">
+          <div className="rounded-2xl border border-white/10 bg-[#1A1A23] overflow-hidden">
+            <div className="px-5 py-4 border-b border-white/10 flex items-center gap-3">
               <LifeBuoy className="w-5 h-5 text-white/40" />
               <h2 className="font-semibold">Support</h2>
             </div>
@@ -247,8 +247,8 @@ const ClientDashboard = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] overflow-hidden">
-            <div className="px-5 py-4 border-b border-white/[0.06]">
+          <div className="rounded-2xl border border-white/10 bg-[#1A1A23] overflow-hidden">
+            <div className="px-5 py-4 border-b border-white/10">
               <h2 className="font-semibold">Quick Actions</h2>
             </div>
             <div className="p-4 space-y-2">
@@ -280,10 +280,10 @@ const StatCard = ({ label, value, icon, color, highlight }) => {
   };
   
   return (
-    <div className={`p-5 rounded-2xl border bg-[#0A0A0F] transition-all ${
+    <div className={`p-5 rounded-2xl border bg-[#1A1A23] transition-all ${
       highlight 
         ? 'border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-transparent' 
-        : 'border-white/[0.06]'
+        : 'border-white/10'
     }`}>
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs font-medium text-white/40 tracking-wide">{label}</span>
@@ -298,7 +298,7 @@ const StatCard = ({ label, value, icon, color, highlight }) => {
 const ProjectCard = ({ project, onClick, progress }) => (
   <button
     onClick={onClick}
-    className="w-full p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:border-blue-500/30 hover:bg-white/[0.04] transition-all group text-left"
+    className="w-full p-4 rounded-xl border border-white/10 bg-white/[0.02] hover:border-blue-500/30 hover:bg-white/[0.04] transition-all group text-left"
   >
     <div className="flex items-center justify-between mb-3">
       <div className="flex items-center gap-3">

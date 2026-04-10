@@ -133,8 +133,8 @@ const ClientHub = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Projects */}
         <div className="lg:col-span-2">
-          <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] overflow-hidden">
-            <div className="p-5 border-b border-white/[0.06] bg-white/[0.02] flex items-center justify-between">
+          <div className="rounded-2xl border border-white/10 bg-[#1A1A23] overflow-hidden">
+            <div className="p-5 border-b border-white/10 bg-white/[0.03] flex items-center justify-between">
               <h3 className="font-semibold flex items-center gap-2">
                 <FolderKanban className="w-4 h-4 text-white/40" />
                 Active Projects
@@ -164,7 +164,7 @@ const ClientHub = () => {
                 </button>
               </div>
             ) : (
-              <div className="divide-y divide-white/[0.06]">
+              <div className="divide-y divide-white/10">
                 {activeProjects.slice(0, 4).map((project) => (
                   <ProjectRow 
                     key={project.project_id}
@@ -180,8 +180,8 @@ const ClientHub = () => {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Support */}
-          <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] overflow-hidden">
-            <div className="p-5 border-b border-white/[0.06] bg-white/[0.02] flex items-center justify-between">
+          <div className="rounded-2xl border border-white/10 bg-[#1A1A23] overflow-hidden">
+            <div className="p-5 border-b border-white/10 bg-white/[0.03] flex items-center justify-between">
               <h3 className="font-semibold flex items-center gap-2">
                 <LifeBuoy className="w-4 h-4 text-white/40" />
                 Support
@@ -198,7 +198,7 @@ const ClientHub = () => {
                 <p className="text-sm text-white/40">No support tickets</p>
               </div>
             ) : (
-              <div className="divide-y divide-white/[0.06]">
+              <div className="divide-y divide-white/10">
                 {tickets.slice(0, 3).map(ticket => (
                   <div key={ticket.ticket_id} className="p-4">
                     <h4 className="text-sm font-medium truncate">{ticket.title}</h4>
@@ -217,7 +217,7 @@ const ClientHub = () => {
               </div>
             )}
             
-            <div className="p-4 border-t border-white/[0.06]">
+            <div className="p-4 border-t border-white/10">
               <button
                 onClick={() => navigate('/client/support')}
                 className="w-full py-2.5 border border-white/10 rounded-xl text-sm text-white/60 hover:text-white hover:border-white/20 transition-all"
@@ -228,7 +228,7 @@ const ClientHub = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] p-5">
+          <div className="rounded-2xl border border-white/10 bg-[#1A1A23] p-5">
             <h3 className="font-semibold mb-4">Quick Actions</h3>
             <div className="space-y-2">
               <ActionButton 
@@ -257,11 +257,11 @@ const StatCard = ({ label, value, icon, color, highlight }) => {
   };
   
   return (
-    <div className={`p-5 rounded-2xl border bg-[#0A0A0F] transition-all ${
-      highlight ? 'border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-transparent' : 'border-white/[0.06]'
+    <div className={`p-5 rounded-2xl border bg-[#1A1A23] transition-all ${
+      highlight ? 'border-amber-500/40 bg-gradient-to-br from-amber-500/15 to-[#1A1A23]' : 'border-white/10'
     }`}>
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-medium text-white/40 uppercase tracking-wide">{label}</span>
+        <span className="text-xs font-medium text-white/50 uppercase tracking-wide">{label}</span>
         <span className={colors[color]}>{icon}</span>
       </div>
       <div className="text-3xl font-semibold text-white">{value}</div>
@@ -300,9 +300,9 @@ const ProjectRow = ({ project, onClick }) => {
 const ActionButton = ({ icon, label, onClick }) => (
   <button
     onClick={onClick}
-    className="w-full p-3 border border-white/[0.06] rounded-xl flex items-center gap-3 text-sm hover:bg-white/[0.02] hover:border-white/10 transition-all"
+    className="w-full p-3 border border-white/10 rounded-xl flex items-center gap-3 text-sm hover:bg-white/[0.05] hover:border-white/20 transition-all"
   >
-    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/50">
+    <div className="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-white/60">
       {icon}
     </div>
     {label}
