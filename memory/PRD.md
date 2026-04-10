@@ -19,10 +19,11 @@ All internal cabinet pages (Developer & Client) have been redesigned to match th
 - ClientHub.js - Updated dashboard matching developer style with consistent components
 
 **Design System Applied:**
-- Background: #05050A
-- Surface: #0A0A0F
+- Background: #0D0D12 (lighter, less eye strain)
+- Surface/Cards: #1A1A23 (more contrast)
+- Sidebar: #16161D
 - Primary: #2563EB (blue-600)
-- Borders: white/[0.06]
+- Borders: white/10 (more visible)
 - Corners: rounded-2xl
 - Cards: glass-morphism with gradient backgrounds
 - Shadows: shadow-blue-600/20
