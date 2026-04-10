@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, API } from '@/App';
 import axios from 'axios';
-import { ArrowRight, Sparkles, Zap, Clock, CheckCircle2, MessageCircle, ChevronRight, Layers, Calendar, DollarSign } from 'lucide-react';
+import { ArrowRight, Sparkles, Zap, Clock, CheckCircle2, MessageCircle, ChevronRight, Layers, Calendar, DollarSign, X } from 'lucide-react';
 
 const ClientHub = () => {
   const { user } = useAuth();
@@ -11,6 +11,8 @@ const ClientHub = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [newProjectId, setNewProjectId] = useState(null);
 
   useEffect(() => {
     fetchProjects();
@@ -39,12 +41,24 @@ const ClientHub = () => {
       }, { withCredentials: true });
       
       setIdea('');
-      await fetchProjects();
+      setNewProjectId(res.data.request_id);
       
-      // Show success state
-      alert('Project created! AI is now structuring your idea...');
+      // Show success toast
+      setToast({
+        type: 'success',
+        title: 'Project Created!',
+        message: 'AI is now structuring your idea into features and timeline...'
+      });
+      
+      // Refresh projects
+      await fetchProjects();
     } catch (err) {
-      alert(err.response?.data?.detail || 'Failed to create project');
+      setToast({
+        type: 'error',
+        title: 'Error',
+        message: err.response?.data?.detail || 'Failed to create project. Please try again.'
+      });
+      setTimeout(() => setToast(null), 5000);
     } finally {
       setSubmitting(false);
     }
@@ -180,7 +194,7 @@ const ClientHub = () => {
       )}
 
       {/* Empty State */}
-      {!loading && projects.length === 0 && (
+      {!loading && projects.length === 0 && !newProjectId && (
         <section className="rounded-2xl bg-[#151922] border border-white/10 p-12 text-center">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/20 to-violet-500/20 mx-auto mb-6 flex items-center justify-center">
             <Sparkles className="w-8 h-8 text-blue-400" />
@@ -190,6 +204,47 @@ const ClientHub = () => {
             Start your first product in 2 minutes. Describe your idea above and we'll break it into features, timeline and cost.
           </p>
         </section>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed bottom-6 right-6 max-w-md p-4 rounded-2xl shadow-2xl border animate-slide-up ${
+          toast.type === 'success' 
+            ? 'bg-emerald-500/10 border-emerald-500/30' 
+            : 'bg-red-500/10 border-red-500/30'
+        }`}>
+          <div className="flex items-start gap-3">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+              toast.type === 'success' ? 'bg-emerald-500/20' : 'bg-red-500/20'
+            }`}>
+              {toast.type === 'success' ? (
+                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+              ) : (
+                <X className="w-5 h-5 text-red-400" />
+              )}
+            </div>
+            <div className="flex-1">
+              <h4 className={`font-semibold ${
+                toast.type === 'success' ? 'text-emerald-400' : 'text-red-400'
+              }`}>{toast.title}</h4>
+              <p className="text-sm text-white/60 mt-1">{toast.message}</p>
+              {toast.type === 'success' && (
+                <button
+                  onClick={() => navigate('/client/projects')}
+                  className="mt-3 text-sm text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
+                >
+                  View Projects <ChevronRight className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            <button 
+              onClick={() => setToast(null)}
+              className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+            >
+              <X className="w-4 h-4 text-white/40" />
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
