@@ -32,14 +32,17 @@ const ClientHub = () => {
     setSubmitting(true);
     
     try {
-      await axios.post(`${API}/requests`, {
+      const res = await axios.post(`${API}/requests`, {
         title: idea.slice(0, 100),
         description: idea,
         business_idea: idea,
       }, { withCredentials: true });
       
       setIdea('');
-      fetchProjects();
+      await fetchProjects();
+      
+      // Show success state
+      alert('Project created! AI is now structuring your idea...');
     } catch (err) {
       alert(err.response?.data?.detail || 'Failed to create project');
     } finally {

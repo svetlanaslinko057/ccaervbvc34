@@ -1,4 +1,4 @@
-# Development OS - Execution Platform
+# Development OS - AI Product Builder
 
 ## Project Overview
 **Tech Stack:** React + FastAPI + MongoDB + Socket.IO  
@@ -7,26 +7,26 @@
 
 ---
 
-## Recent Changes (April 10, 2026)
+## Recent Changes (April 10, 2026) - UX Overhaul
 
-### Full Redesign of Internal Cabinets
-All internal cabinet pages (Developer & Client) have been redesigned to match the main landing page style:
+### From CRM to AI Product Builder
+Complete redesign of internal cabinets with focus on user journey:
 
-**Updated Pages:**
-- DeveloperHub.js - New dashboard with stats, next task card, recent activity, quick actions
-- DeveloperWorkPage.js - Complete redesign with status cards, time tracking, submission history
-- NewRequest.js - Modern form with gradient heading, example ideas, what happens next section
-- ClientHub.js - Updated dashboard matching developer style with consistent components
+**Key Changes:**
+1. **Hero-first Dashboard** - Single primary action "What do you want to build?"
+2. **Simplified Navigation** - Client: Home, Projects only. Developer: Home, Board, Assignments, Performance
+3. **Project Timeline** - Visual stages: AI Structuring → Scope → Design → Development → QA → Delivery
+4. **Inline Chat** - Support integrated into project details
+5. **Selling Empty States** - "Start your first product in 2 minutes"
+6. **Status Badges** - "AI structuring your idea...", "Building your product"
 
-**Design System Applied:**
-- Background: #0D0D12 (lighter, less eye strain)
-- Surface/Cards: #1A1A23 (more contrast)
-- Sidebar: #16161D
-- Primary: #2563EB (blue-600)
-- Borders: white/10 (more visible)
-- Corners: rounded-2xl
-- Cards: glass-morphism with gradient backgrounds
-- Shadows: shadow-blue-600/20
+**Design System:**
+- Background: #0B0F14
+- Cards: #151922
+- Sidebar: #0f1318
+- Primary: Blue-Violet gradient (from-blue-500 to-violet-500)
+- Accent: Emerald for Developer (from-emerald-500 to-cyan-500)
+- Borders: white/10
 
 ---
 
