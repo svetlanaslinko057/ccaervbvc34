@@ -1,99 +1,52 @@
-import { useState, useCallback } from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/App';
-import { ExecutorRealtimeBridge } from '@/components/RealtimeBridge';
-import {
-  LayoutDashboard,
-  Columns,
-  ClipboardList,
-  BarChart3,
-  User,
-  LogOut,
-  ChevronRight,
-  Code2
-} from 'lucide-react';
+import { Home, Kanban, List, BarChart3, LogOut } from 'lucide-react';
 
 const DeveloperLayout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleLogout = async () => {
     await logout();
     navigate('/');
   };
 
-  const handleRefresh = useCallback(() => {
-    setRefreshKey(k => k + 1);
-  }, []);
-
-  const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');
-
-  const navItems = [
-    { label: 'Dashboard', path: '/developer/dashboard', icon: LayoutDashboard },
-    { label: 'Work Board', path: '/developer/board', icon: Columns },
-    { label: 'Assignments', path: '/developer/assignments', icon: ClipboardList },
-    { label: 'Performance', path: '/developer/performance', icon: BarChart3 },
-  ];
-
   return (
-    <div className="min-h-screen bg-[#0D0D12] text-white flex" data-testid="developer-layout">
-      {/* Realtime Bridge */}
-      {user?.user_id && (
-        <ExecutorRealtimeBridge userId={user.user_id} onRefresh={handleRefresh} />
-      )}
-      
+    <div className="min-h-screen bg-[#0B0F14] text-white flex" data-testid="developer-layout">
       {/* Sidebar */}
-      <aside className="w-[260px] border-r border-white/10 flex flex-col sticky top-0 h-screen bg-[#16161D]">
+      <aside className="w-[240px] border-r border-white/10 flex flex-col sticky top-0 h-screen bg-[#0f1318]">
         {/* Logo */}
         <div className="h-16 border-b border-white/10 px-5 flex items-center gap-3">
-          <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <span className="text-white font-bold text-sm">D</span>
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center font-bold text-lg shadow-lg shadow-emerald-500/20">
+            D
           </div>
           <div>
-            <span className="font-semibold text-white tracking-tight">Dev OS</span>
-            <span className="text-white/30 text-xs block">Builder</span>
+            <h1 className="font-semibold text-sm">Dev OS</h1>
+            <p className="text-[11px] text-white/40">Builder Portal</p>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4">
-          <div className="space-y-1">
-            {navItems.map((item) => (
-              <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                  isActive(item.path) 
-                    ? 'bg-blue-600/10 text-blue-400 border border-blue-500/20' 
-                    : 'text-white/50 hover:text-white hover:bg-white/5'
-                }`}
-                data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
-              >
-                <item.icon className="w-[18px] h-[18px]" strokeWidth={1.5} />
-                <span>{item.label}</span>
-                {isActive(item.path) && (
-                  <ChevronRight className="w-4 h-4 ml-auto text-blue-400/50" />
-                )}
-              </button>
-            ))}
-          </div>
+        <nav className="flex-1 p-3 space-y-1">
+          <NavItem to="/developer/dashboard" icon={<Home className="w-[18px] h-[18px]" />} label="Home" />
+          <NavItem to="/developer/board" icon={<Kanban className="w-[18px] h-[18px]" />} label="Work Board" />
+          <NavItem to="/developer/assignments" icon={<List className="w-[18px] h-[18px]" />} label="Assignments" />
+          <NavItem to="/developer/performance" icon={<BarChart3 className="w-[18px] h-[18px]" />} label="Performance" />
         </nav>
 
         {/* User */}
-        <div className="p-4 border-t border-white/10">
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.05] border border-white/10">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 flex items-center justify-center border border-blue-500/20">
-              <Code2 className="w-4 h-4 text-blue-400" />
+        <div className="p-3 border-t border-white/10">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500/30 to-cyan-500/30 flex items-center justify-center font-semibold text-sm border border-white/10">
+              {user?.name?.[0]?.toUpperCase() || 'D'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate text-white">{user?.name || 'Developer'}</p>
-              <p className="text-xs text-white/30 truncate">{user?.user_id?.slice(0, 12)}...</p>
+              <p className="text-sm font-medium truncate">{user?.name || 'Developer'}</p>
+              <p className="text-[11px] text-white/40 capitalize">{user?.level || 'Developer'}</p>
             </div>
-            <button
+            <button 
               onClick={handleLogout}
-              className="p-2 text-white/30 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/40 hover:text-white"
               data-testid="logout-btn"
             >
               <LogOut className="w-4 h-4" />
@@ -103,11 +56,30 @@ const DeveloperLayout = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 min-h-screen overflow-auto bg-[#0D0D12]">
+      <main className="flex-1 min-h-screen overflow-auto bg-[#0B0F14]">
         <Outlet />
       </main>
     </div>
   );
 };
+
+const NavItem = ({ to, icon, label, badge }) => (
+  <NavLink
+    to={to}
+    className={({ isActive }) =>
+      `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+        isActive 
+          ? 'bg-gradient-to-r from-emerald-500/20 to-cyan-500/10 text-white border border-emerald-500/20' 
+          : 'text-white/50 hover:text-white hover:bg-white/5'
+      }`
+    }
+  >
+    {icon}
+    <span className="flex-1">{label}</span>
+    {badge && (
+      <span className="px-2 py-0.5 text-xs bg-emerald-500/20 text-emerald-400 rounded-full">{badge}</span>
+    )}
+  </NavLink>
+);
 
 export default DeveloperLayout;

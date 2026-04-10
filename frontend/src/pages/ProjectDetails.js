@@ -5,25 +5,18 @@ import axios from 'axios';
 import {
   ArrowLeft,
   CheckCircle2,
+  Circle,
   Clock,
-  Package,
-  MessageSquare,
-  ExternalLink,
-  AlertCircle,
-  ChevronRight,
-  LifeBuoy,
-  Layers,
-  Code,
+  Download,
   FileText,
-  Search,
-  Compass,
-  Palette,
-  TestTube,
-  Truck,
-  Headphones,
-  Play,
-  AlertTriangle,
-  Plus
+  Layers,
+  MessageCircle,
+  Send,
+  Sparkles,
+  Zap,
+  Calendar,
+  Users,
+  ExternalLink
 } from 'lucide-react';
 
 const ProjectDetails = () => {
@@ -33,373 +26,348 @@ const ProjectDetails = () => {
   
   const [project, setProject] = useState(null);
   const [deliverables, setDeliverables] = useState([]);
-  const [tickets, setTickets] = useState([]);
+  const [scopeItems, setScopeItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [chatMessage, setChatMessage] = useState('');
+  const [chatHistory, setChatHistory] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [projectRes, deliverablesRes, ticketsRes] = await Promise.all([
-          axios.get(`${API}/projects/${projectId}`, { withCredentials: true }),
-          axios.get(`${API}/projects/${projectId}/deliverables`, { withCredentials: true }),
-          axios.get(`${API}/client/support-tickets`, { withCredentials: true }).catch(() => ({ data: [] }))
-        ]);
-        setProject(projectRes.data);
-        setDeliverables(deliverablesRes.data);
-        // Filter tickets for this project
-        setTickets((ticketsRes.data || []).filter(t => t.project_id === projectId));
-      } catch (error) {
-        console.error('Error fetching project:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, [projectId]);
 
-  const STAGES = [
-    { id: 'discovery', label: 'Discovery', icon: Search, description: 'Understanding requirements' },
-    { id: 'scope', label: 'Scope', icon: Compass, description: 'Defining project boundaries' },
-    { id: 'design', label: 'Design', icon: Palette, description: 'UI/UX design phase' },
-    { id: 'development', label: 'Development', icon: Code, description: 'Building features' },
-    { id: 'qa', label: 'Testing', icon: TestTube, description: 'Quality assurance' },
-    { id: 'delivery', label: 'Delivery', icon: Truck, description: 'Final delivery' },
-    { id: 'support', label: 'Support', icon: Headphones, description: 'Ongoing support' },
-  ];
+  const fetchData = async () => {
+    try {
+      const [projectRes, deliverablesRes, scopeRes] = await Promise.all([
+        axios.get(`${API}/projects/${projectId}`, { withCredentials: true }),
+        axios.get(`${API}/projects/${projectId}/deliverables`, { withCredentials: true }).catch(() => ({ data: [] })),
+        axios.get(`${API}/projects/${projectId}/scope`, { withCredentials: true }).catch(() => ({ data: [] }))
+      ]);
+      
+      setProject(projectRes.data);
+      setDeliverables(deliverablesRes.data);
+      setScopeItems(scopeRes.data);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const getStageIndex = (stage) => STAGES.findIndex(s => s.id === stage);
-  const currentStageIndex = project ? getStageIndex(project.current_stage) : 0;
-
-  const pendingDeliverables = deliverables.filter(d => d.status === 'pending');
-  const openTickets = tickets.filter(t => t.status === 'open' || t.status === 'in_progress');
+  const handleSendMessage = () => {
+    if (!chatMessage.trim()) return;
+    setChatHistory([...chatHistory, { 
+      id: Date.now(), 
+      text: chatMessage, 
+      sender: 'user',
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }]);
+    setChatMessage('');
+    // In real app, this would send to backend
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-2 border-white/10 border-t-white rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-white/10 border-t-blue-500 rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!project) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-white/30 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold mb-2">Project not found</h2>
-          <button onClick={() => navigate('/client/dashboard')} className="text-white/50 hover:text-white">
-            Back to Dashboard
-          </button>
-        </div>
+      <div className="p-8 text-center">
+        <p className="text-white/50">Project not found</p>
+        <button onClick={() => navigate('/client/dashboard')} className="mt-4 text-blue-400 hover:text-blue-300">
+          Back to Dashboard
+        </button>
       </div>
     );
   }
 
+  const stages = [
+    { key: 'discovery', label: 'AI Structuring', icon: Sparkles },
+    { key: 'scope', label: 'Scope Ready', icon: Layers },
+    { key: 'design', label: 'Design', icon: FileText },
+    { key: 'development', label: 'Development', icon: Zap },
+    { key: 'qa', label: 'Quality Check', icon: CheckCircle2 },
+    { key: 'delivery', label: 'Delivered', icon: Download },
+  ];
+  
+  const currentStageIndex = stages.findIndex(s => s.key === project.current_stage);
+
   return (
-    <div className="p-8 max-w-6xl" data-testid="project-details">
-      {/* Breadcrumb */}
-      <button 
+    <div className="min-h-screen p-8" data-testid="project-details">
+      {/* Back Button */}
+      <button
         onClick={() => navigate('/client/dashboard')}
-        className="flex items-center gap-2 text-white/50 hover:text-white transition-colors mb-6"
+        className="flex items-center gap-2 text-white/50 hover:text-white text-sm mb-6 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to Dashboard
       </button>
 
-      {/* Project Header */}
-      <div className="border border-white/10 rounded-2xl p-6 mb-6">
+      {/* Header */}
+      <div className="mb-8">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">{project.name}</h1>
-            <div className="flex items-center gap-3 mt-3">
-              <span className={`px-3 py-1 text-sm rounded-lg ${
-                project.status === 'active' 
-                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
-                  : project.status === 'completed'
-                  ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-                  : 'bg-white/5 text-white/50 border border-white/10'
-              }`}>
-                {project.status}
-              </span>
-              <span className="text-white/40 text-sm">Stage: <span className="text-white capitalize">{project.current_stage}</span></span>
-            </div>
+            <h1 className="text-3xl font-semibold tracking-tight mb-2">{project.name}</h1>
+            <StatusBadge stage={project.current_stage} />
           </div>
-          
-          {/* Quick Stats */}
-          <div className="flex items-center gap-4">
-            {pendingDeliverables.length > 0 && (
-              <div className="px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-xl">
-                <span className="text-amber-400 text-sm font-medium">
-                  {pendingDeliverables.length} pending approval
-                </span>
-              </div>
-            )}
-            {openTickets.length > 0 && (
-              <div className="px-4 py-2 bg-blue-500/10 border border-blue-500/30 rounded-xl">
-                <span className="text-blue-400 text-sm font-medium">
-                  {openTickets.length} open tickets
-                </span>
-              </div>
-            )}
-          </div>
+          <ProgressRing progress={Math.round(((currentStageIndex + 1) / stages.length) * 100)} />
         </div>
       </div>
 
-      {/* Pending Approval Alert */}
-      {pendingDeliverables.length > 0 && (
-        <div className="mb-6 border-2 border-amber-500/50 rounded-2xl bg-amber-500/5 p-5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-amber-400" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-amber-400">Delivery Ready for Review</h3>
-                <p className="text-amber-400/70 text-sm">{pendingDeliverables[0].title}</p>
-              </div>
-            </div>
-            <button
-              onClick={() => navigate(`/client/deliverable/${pendingDeliverables[0].deliverable_id}`)}
-              className="px-5 py-2.5 bg-amber-500 text-black font-semibold rounded-xl hover:bg-amber-400 transition-colors"
-            >
-              Review Delivery
-            </button>
-          </div>
-        </div>
-      )}
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Main Content */}
+        {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Timeline */}
-          <div className="border border-white/10 rounded-2xl overflow-hidden">
-            <div className="p-5 border-b border-white/10 bg-white/[0.02]">
-              <h2 className="font-semibold">Project Timeline</h2>
-            </div>
-            <div className="p-6">
-              <div className="relative">
-                {/* Progress Line */}
-                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-white/10" />
-                <div 
-                  className="absolute left-4 top-0 w-0.5 bg-emerald-500 transition-all"
-                  style={{ height: `${((currentStageIndex + 1) / STAGES.length) * 100}%` }}
-                />
+          {/* Status Timeline */}
+          <Card title="Project Timeline" icon={<Clock className="w-4 h-4 text-blue-400" />}>
+            <div className="relative">
+              {stages.map((stage, i) => {
+                const Icon = stage.icon;
+                const isCompleted = i < currentStageIndex;
+                const isCurrent = i === currentStageIndex;
+                const isPending = i > currentStageIndex;
                 
-                {/* Stages */}
-                <div className="space-y-6">
-                  {STAGES.map((stage, index) => {
-                    const isComplete = index < currentStageIndex;
-                    const isCurrent = index === currentStageIndex;
-                    const isFuture = index > currentStageIndex;
-                    const Icon = stage.icon;
-                    
-                    return (
-                      <div key={stage.id} className="relative flex items-start gap-4 pl-10">
-                        {/* Dot */}
-                        <div className={`absolute left-2.5 w-3 h-3 rounded-full border-2 ${
-                          isComplete ? 'bg-emerald-500 border-emerald-500' :
-                          isCurrent ? 'bg-white border-white' :
-                          'bg-transparent border-white/20'
+                return (
+                  <div key={stage.key} className="flex gap-4 pb-6 last:pb-0">
+                    {/* Line */}
+                    <div className="flex flex-col items-center">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                        isCompleted ? 'bg-emerald-500/20 border border-emerald-500/30' :
+                        isCurrent ? 'bg-blue-500/20 border border-blue-500/30 ring-4 ring-blue-500/10' :
+                        'bg-white/5 border border-white/10'
+                      }`}>
+                        {isCompleted ? (
+                          <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                        ) : isCurrent ? (
+                          <Icon className="w-5 h-5 text-blue-400" />
+                        ) : (
+                          <Circle className="w-5 h-5 text-white/20" />
+                        )}
+                      </div>
+                      {i < stages.length - 1 && (
+                        <div className={`w-0.5 flex-1 mt-2 ${
+                          isCompleted ? 'bg-emerald-500/30' : 'bg-white/10'
                         }`} />
-                        
-                        {/* Content */}
-                        <div className={`flex-1 ${isFuture ? 'opacity-40' : ''}`}>
-                          <div className="flex items-center gap-3">
-                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                              isComplete ? 'bg-emerald-500/10' :
-                              isCurrent ? 'bg-white/10' :
-                              'bg-white/5'
-                            }`}>
-                              {isComplete ? (
-                                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                              ) : isCurrent ? (
-                                <Play className="w-4 h-4 text-white" />
-                              ) : (
-                                <Icon className="w-4 h-4 text-white/30" />
-                              )}
-                            </div>
-                            <div>
-                              <h4 className={`font-medium ${isCurrent ? 'text-white' : ''}`}>{stage.label}</h4>
-                              <p className="text-xs text-white/40">{stage.description}</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Deliverables History */}
-          <div className="border border-white/10 rounded-2xl overflow-hidden">
-            <div className="p-5 border-b border-white/10 bg-white/[0.02] flex items-center justify-between">
-              <h2 className="font-semibold">Deliverables</h2>
-              <span className="text-white/40 text-sm">{deliverables.length} total</span>
-            </div>
-            
-            {deliverables.length === 0 ? (
-              <div className="p-12 text-center">
-                <Package className="w-10 h-10 text-white/20 mx-auto mb-3" />
-                <p className="text-white/40 text-sm">No deliverables yet</p>
-                <p className="text-white/30 text-xs mt-1">Deliveries will appear here as development progresses</p>
-              </div>
-            ) : (
-              <div className="divide-y divide-white/5">
-                {deliverables.map(dlv => (
-                  <button
-                    key={dlv.deliverable_id}
-                    onClick={() => navigate(`/client/deliverable/${dlv.deliverable_id}`)}
-                    className="w-full text-left p-5 hover:bg-white/[0.02] transition-colors group"
-                    data-testid={`deliverable-${dlv.deliverable_id}`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                          dlv.status === 'approved' ? 'bg-emerald-500/10' :
-                          dlv.status === 'pending' ? 'bg-amber-500/10' :
-                          'bg-red-500/10'
-                        }`}>
-                          {dlv.status === 'approved' ? (
-                            <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                          ) : dlv.status === 'pending' ? (
-                            <Clock className="w-5 h-5 text-amber-400" />
-                          ) : (
-                            <AlertCircle className="w-5 h-5 text-red-400" />
-                          )}
-                        </div>
-                        <div>
-                          <h4 className="font-medium group-hover:text-white transition-colors">{dlv.title}</h4>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-white/40">{dlv.version}</span>
-                            <span className={`px-2 py-0.5 text-xs rounded ${
-                              dlv.status === 'approved' ? 'bg-emerald-500/10 text-emerald-400' :
-                              dlv.status === 'pending' ? 'bg-amber-500/10 text-amber-400' :
-                              'bg-red-500/10 text-red-400'
-                            }`}>
-                              {dlv.status.replace('_', ' ')}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-white/20 group-hover:text-white/50 transition-colors" />
+                      )}
                     </div>
+                    
+                    {/* Content */}
+                    <div className="flex-1 pt-2">
+                      <h4 className={`font-medium ${
+                        isCompleted ? 'text-emerald-400' :
+                        isCurrent ? 'text-white' :
+                        'text-white/40'
+                      }`}>
+                        {stage.label}
+                        {isCurrent && <span className="ml-2 text-xs text-blue-400 animate-pulse">In progress</span>}
+                      </h4>
+                      {isCurrent && project.current_stage === 'discovery' && (
+                        <p className="text-sm text-white/50 mt-1">AI is analyzing your idea and creating structure...</p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+
+          {/* AI Structure / Scope */}
+          {scopeItems.length > 0 && (
+            <Card title="AI Structure" icon={<Sparkles className="w-4 h-4 text-violet-400" />}>
+              <p className="text-white/50 text-sm mb-4">We've broken your idea into these features:</p>
+              <div className="space-y-3">
+                {scopeItems.map((item, i) => (
+                  <div key={item.scope_item_id || i} className="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
+                    <div className="w-6 h-6 rounded-lg bg-violet-500/20 flex items-center justify-center text-xs font-bold text-violet-400">
+                      {i + 1}
+                    </div>
+                    <div>
+                      <h5 className="font-medium">{item.name || item.title}</h5>
+                      {item.description && (
+                        <p className="text-sm text-white/50 mt-1">{item.description}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {/* Deliverables */}
+          {deliverables.length > 0 && (
+            <Card title="Deliverables" icon={<Download className="w-4 h-4 text-emerald-400" />}>
+              <div className="space-y-3">
+                {deliverables.map((d) => (
+                  <button
+                    key={d.deliverable_id}
+                    onClick={() => navigate(`/client/deliverable/${d.deliverable_id}`)}
+                    className="w-full flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 hover:bg-white/[0.07] transition-all text-left group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                      <FileText className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="font-medium group-hover:text-emerald-400 transition-colors">{d.title}</h5>
+                      <p className="text-sm text-white/40">{d.deliverable_type}</p>
+                    </div>
+                    <DeliverableStatus status={d.status} />
                   </button>
                 ))}
               </div>
-            )}
-          </div>
+            </Card>
+          )}
         </div>
 
-        {/* Right Column - Sidebar */}
+        {/* Sidebar */}
         <div className="space-y-6">
-          {/* Actions */}
-          <div className="border border-white/10 rounded-2xl p-5">
-            <h3 className="font-semibold mb-4">Actions</h3>
-            <div className="space-y-2">
-              {pendingDeliverables.length > 0 && (
-                <button
-                  onClick={() => navigate(`/client/deliverable/${pendingDeliverables[0].deliverable_id}`)}
-                  className="w-full p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-400 text-sm font-medium hover:bg-amber-500/20 transition-all flex items-center gap-3"
-                >
-                  <Package className="w-4 h-4" />
-                  Review Pending Delivery
-                </button>
-              )}
-              <button
-                onClick={() => navigate('/client/support', { state: { projectId } })}
-                className="w-full p-3 border border-white/10 rounded-xl text-sm hover:bg-white/5 transition-all flex items-center gap-3"
-              >
-                <LifeBuoy className="w-4 h-4 text-white/50" />
-                Create Support Ticket
-              </button>
-              <button
-                onClick={() => navigate('/client/request/new')}
-                className="w-full p-3 border border-white/10 rounded-xl text-sm hover:bg-white/5 transition-all flex items-center gap-3"
-              >
-                <Plus className="w-4 h-4 text-white/50" />
-                Request New Feature
-              </button>
+          {/* Quick Info */}
+          <Card>
+            <div className="space-y-4">
+              <InfoRow icon={<Calendar className="w-4 h-4" />} label="Created" value={new Date(project.created_at).toLocaleDateString()} />
+              <InfoRow icon={<Layers className="w-4 h-4" />} label="Features" value={scopeItems.length || '—'} />
+              <InfoRow icon={<FileText className="w-4 h-4" />} label="Deliverables" value={deliverables.length || '—'} />
             </div>
-          </div>
+          </Card>
 
-          {/* Project Info */}
-          <div className="border border-white/10 rounded-2xl overflow-hidden">
-            <div className="p-5 border-b border-white/10 bg-white/[0.02]">
-              <h3 className="font-semibold">Project Details</h3>
-            </div>
-            <div className="p-5 space-y-4">
-              <div>
-                <p className="text-xs text-white/40 uppercase tracking-wider mb-1">Status</p>
-                <p className="font-medium capitalize">{project.status}</p>
-              </div>
-              <div>
-                <p className="text-xs text-white/40 uppercase tracking-wider mb-1">Current Stage</p>
-                <p className="font-medium capitalize">{project.current_stage}</p>
-              </div>
-              <div>
-                <p className="text-xs text-white/40 uppercase tracking-wider mb-1">Progress</p>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-emerald-500 rounded-full"
-                      style={{ width: `${((currentStageIndex + 1) / STAGES.length) * 100}%` }}
-                    />
+          {/* Chat with Team */}
+          <Card title="Chat with Team" icon={<MessageCircle className="w-4 h-4 text-blue-400" />}>
+            <div className="h-64 flex flex-col">
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto space-y-3 mb-4">
+                {chatHistory.length === 0 ? (
+                  <div className="text-center py-8">
+                    <MessageCircle className="w-8 h-8 text-white/20 mx-auto mb-2" />
+                    <p className="text-sm text-white/40">No messages yet</p>
+                    <p className="text-xs text-white/30">Ask questions about your project</p>
                   </div>
-                  <span className="text-sm text-white/60">
-                    {Math.round(((currentStageIndex + 1) / STAGES.length) * 100)}%
-                  </span>
-                </div>
-              </div>
-              <div>
-                <p className="text-xs text-white/40 uppercase tracking-wider mb-1">Deliverables</p>
-                <p className="font-medium">{deliverables.filter(d => d.status === 'approved').length} / {deliverables.length} approved</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Recent Support Tickets */}
-          {tickets.length > 0 && (
-            <div className="border border-white/10 rounded-2xl overflow-hidden">
-              <div className="p-5 border-b border-white/10 bg-white/[0.02] flex items-center justify-between">
-                <h3 className="font-semibold">Support Tickets</h3>
-                {openTickets.length > 0 && (
-                  <span className="px-2 py-0.5 text-xs bg-blue-500/10 text-blue-400 rounded">
-                    {openTickets.length} open
-                  </span>
+                ) : (
+                  chatHistory.map(msg => (
+                    <div key={msg.id} className={`p-3 rounded-xl max-w-[85%] ${
+                      msg.sender === 'user' 
+                        ? 'bg-blue-500/20 ml-auto' 
+                        : 'bg-white/5'
+                    }`}>
+                      <p className="text-sm">{msg.text}</p>
+                      <p className="text-[10px] text-white/30 mt-1">{msg.time}</p>
+                    </div>
+                  ))
                 )}
               </div>
-              <div className="divide-y divide-white/5">
-                {tickets.slice(0, 3).map(ticket => (
-                  <div key={ticket.ticket_id} className="p-4">
-                    <div className="flex items-center justify-between mb-1">
-                      <h4 className="text-sm font-medium truncate">{ticket.title}</h4>
-                      <span className={`px-2 py-0.5 text-xs rounded ${
-                        ticket.status === 'open' ? 'bg-amber-500/10 text-amber-400' :
-                        ticket.status === 'in_progress' ? 'bg-blue-500/10 text-blue-400' :
-                        'bg-emerald-500/10 text-emerald-400'
-                      }`}>
-                        {ticket.status.replace('_', ' ')}
-                      </span>
-                    </div>
-                    <p className="text-xs text-white/40 capitalize">{ticket.ticket_type}</p>
-                  </div>
-                ))}
-                <div className="p-4">
-                  <button
-                    onClick={() => navigate('/client/support')}
-                    className="w-full text-center text-sm text-white/50 hover:text-white"
-                  >
-                    View all tickets
-                  </button>
-                </div>
+              
+              {/* Input */}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={chatMessage}
+                  onChange={(e) => setChatMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  placeholder="Type a message..."
+                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-blue-500/50 transition-all"
+                  data-testid="chat-input"
+                />
+                <button
+                  onClick={handleSendMessage}
+                  disabled={!chatMessage.trim()}
+                  className="p-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl disabled:opacity-50 transition-all"
+                  data-testid="send-message-btn"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
               </div>
             </div>
-          )}
+          </Card>
         </div>
       </div>
     </div>
+  );
+};
+
+const Card = ({ title, icon, children }) => (
+  <div className="rounded-2xl bg-[#151922] border border-white/10 overflow-hidden">
+    {title && (
+      <div className="px-5 py-4 border-b border-white/10 flex items-center gap-2">
+        {icon}
+        <h3 className="font-semibold text-sm">{title}</h3>
+      </div>
+    )}
+    <div className="p-5">{children}</div>
+  </div>
+);
+
+const StatusBadge = ({ stage }) => {
+  const config = {
+    discovery: { label: 'AI structuring your idea...', color: 'bg-violet-500/20 text-violet-400 border-violet-500/30', animate: true },
+    scope: { label: 'Scope ready for review', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+    design: { label: 'In design phase', color: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30' },
+    development: { label: 'Building your product', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
+    qa: { label: 'Quality assurance', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
+    delivery: { label: 'Ready for delivery', color: 'bg-green-500/20 text-green-400 border-green-500/30' },
+    completed: { label: 'Completed', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
+  }[stage] || { label: stage, color: 'bg-white/10 text-white/50 border-white/10' };
+
+  return (
+    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border ${config.color}`}>
+      {config.animate && <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />}
+      {config.label}
+    </div>
+  );
+};
+
+const ProgressRing = ({ progress }) => {
+  const circumference = 2 * Math.PI * 36;
+  const offset = circumference - (progress / 100) * circumference;
+  
+  return (
+    <div className="relative w-20 h-20">
+      <svg className="w-full h-full -rotate-90">
+        <circle cx="40" cy="40" r="36" stroke="currentColor" strokeWidth="6" fill="none" className="text-white/10" />
+        <circle
+          cx="40" cy="40" r="36"
+          stroke="url(#gradient)"
+          strokeWidth="6"
+          fill="none"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          className="transition-all duration-500"
+        />
+        <defs>
+          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#3B82F6" />
+            <stop offset="100%" stopColor="#8B5CF6" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-lg font-bold">{progress}%</span>
+      </div>
+    </div>
+  );
+};
+
+const InfoRow = ({ icon, label, value }) => (
+  <div className="flex items-center justify-between">
+    <div className="flex items-center gap-2 text-white/40">
+      {icon}
+      <span className="text-sm">{label}</span>
+    </div>
+    <span className="text-sm font-medium">{value}</span>
+  </div>
+);
+
+const DeliverableStatus = ({ status }) => {
+  const config = {
+    pending: { label: 'Review', color: 'bg-amber-500/20 text-amber-400' },
+    approved: { label: 'Approved', color: 'bg-emerald-500/20 text-emerald-400' },
+    rejected: { label: 'Changes requested', color: 'bg-red-500/20 text-red-400' },
+  }[status] || { label: status, color: 'bg-white/10 text-white/50' };
+
+  return (
+    <span className={`px-2.5 py-1 rounded-lg text-xs font-medium ${config.color}`}>
+      {config.label}
+    </span>
   );
 };
 

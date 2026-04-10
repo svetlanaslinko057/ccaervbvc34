@@ -101,7 +101,7 @@ const DeveloperAssignments = () => {
 
       {/* List */}
       {sortedUnits.length === 0 ? (
-        <div className="rounded-2xl border border-white/10 bg-[#1A1A23] p-16 text-center">
+        <div className="rounded-2xl border border-white/10 bg-[#151922] p-16 text-center">
           <div className="w-20 h-20 rounded-2xl bg-white/5 mx-auto mb-6 flex items-center justify-center">
             <ClipboardList className="w-10 h-10 text-white/20" />
           </div>
@@ -153,7 +153,7 @@ const AssignmentCard = ({ unit, onClick }) => {
       className={`w-full text-left rounded-2xl p-5 flex items-center justify-between transition-all group ${
         isRevision 
           ? 'border border-red-500/30 bg-gradient-to-r from-red-500/10 to-transparent hover:from-red-500/15' 
-          : 'border border-white/10 bg-[#1A1A23] hover:border-blue-500/30 hover:bg-[#0D0D14]'
+          : 'border border-white/10 bg-[#151922] hover:border-blue-500/30 hover:bg-[#0D0D14]'
       }`}
       data-testid={`assignment-${unit.unit_id}`}
     >

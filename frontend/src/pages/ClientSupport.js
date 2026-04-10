@@ -141,7 +141,7 @@ const ClientSupport = () => {
           <div className="w-8 h-8 border-2 border-white/10 border-t-blue-500 rounded-full animate-spin" />
         </div>
       ) : filteredTickets.length === 0 ? (
-        <div className="rounded-2xl border border-white/10 bg-[#1A1A23] p-16 text-center">
+        <div className="rounded-2xl border border-white/10 bg-[#151922] p-16 text-center">
           <div className="w-20 h-20 rounded-2xl bg-white/5 mx-auto mb-6 flex items-center justify-center">
             <LifeBuoy className="w-10 h-10 text-white/20" />
           </div>
@@ -199,7 +199,7 @@ const ClientSupport = () => {
                           ? type.color === 'red' ? 'border-red-500/30 bg-red-500/10' :
                             type.color === 'blue' ? 'border-blue-500/30 bg-blue-500/10' :
                             'border-white/20 bg-white/5'
-                          : 'border-white/10 hover:border-white/20 bg-[#1A1A23]'
+                          : 'border-white/10 hover:border-white/20 bg-[#151922]'
                       }`}
                     >
                       <type.icon className={`w-6 h-6 mx-auto mb-2 ${
@@ -269,7 +269,7 @@ const ClientSupport = () => {
                           ? p === 'high' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
                             p === 'medium' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
                             'bg-white/10 text-white border border-white/20'
-                          : 'border border-white/10 text-white/50 hover:border-white/20 bg-[#1A1A23]'
+                          : 'border border-white/10 text-white/50 hover:border-white/20 bg-[#151922]'
                       }`}
                     >
                       {p}
@@ -312,7 +312,7 @@ const StatCard = ({ label, value, icon, color, highlight }) => {
   };
   
   return (
-    <div className={`p-5 rounded-2xl border bg-[#1A1A23] transition-all ${
+    <div className={`p-5 rounded-2xl border bg-[#151922] transition-all ${
       highlight ? 'border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-transparent' : 'border-white/10'
     }`}>
       <div className="flex items-center justify-between mb-3">
@@ -345,7 +345,7 @@ const TicketCard = ({ ticket, TypeIcon }) => {
 
   return (
     <div
-      className="p-5 rounded-2xl border border-white/10 bg-[#1A1A23] hover:border-blue-500/30 hover:bg-[#0D0D14] transition-all cursor-pointer group"
+      className="p-5 rounded-2xl border border-white/10 bg-[#151922] hover:border-blue-500/30 hover:bg-[#0D0D14] transition-all cursor-pointer group"
       data-testid={`ticket-${ticket.ticket_id}`}
     >
       <div className="flex items-start justify-between">

@@ -119,7 +119,7 @@ const DeveloperPerformance = () => {
       </div>
 
       {/* Total Hours Block */}
-      <div className="rounded-2xl border border-white/10 bg-[#1A1A23] p-8 mb-8">
+      <div className="rounded-2xl border border-white/10 bg-[#151922] p-8 mb-8">
         <div className="flex items-center justify-between">
           <div>
             <div className="text-xs font-medium text-white/40 uppercase tracking-wide mb-2">Total Hours Logged</div>
@@ -146,7 +146,7 @@ const DeveloperPerformance = () => {
       </div>
 
       {/* Recent Completed */}
-      <div className="rounded-2xl border border-white/10 bg-[#1A1A23] overflow-hidden">
+      <div className="rounded-2xl border border-white/10 bg-[#151922] overflow-hidden">
         <div className="px-6 py-5 border-b border-white/10 flex items-center gap-3">
           <CheckCircle2 className="w-5 h-5 text-emerald-400" />
           <h2 className="font-semibold">Recently Completed</h2>
@@ -197,7 +197,7 @@ const StatCard = ({ label, value, icon, color, highlight }) => {
   };
   
   return (
-    <div className={`p-5 rounded-2xl border bg-[#1A1A23] transition-all ${
+    <div className={`p-5 rounded-2xl border bg-[#151922] transition-all ${
       highlight ? 'border-red-500/30 bg-gradient-to-br from-red-500/10 to-transparent' : 'border-white/10'
     }`}>
       <div className="flex items-center justify-between mb-3">

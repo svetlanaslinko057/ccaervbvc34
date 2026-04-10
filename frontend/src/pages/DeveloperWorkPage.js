@@ -483,7 +483,7 @@ const Card = ({ title, children, icon, badge, variant }) => {
     <div className={`rounded-2xl border overflow-hidden ${
       variant === 'submit' 
         ? 'border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-transparent' 
-        : 'border-white/10 bg-[#1A1A23]'
+        : 'border-white/10 bg-[#151922]'
     }`}>
       <div className="px-5 py-4 border-b border-white/10 bg-white/[0.03] flex items-center justify-between">
         <div className="flex items-center gap-2">

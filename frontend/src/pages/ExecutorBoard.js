@@ -319,7 +319,7 @@ const StatCard = ({ label, value, color, highlight }) => {
   };
   
   return (
-    <div className={`p-5 rounded-2xl border bg-[#1A1A23] transition-all ${
+    <div className={`p-5 rounded-2xl border bg-[#151922] transition-all ${
       highlight ? 'border-red-500/30 bg-gradient-to-br from-red-500/10 to-transparent' : 'border-white/10'
     }`}>
       <div className="text-3xl font-semibold text-white mb-1">{value}</div>
@@ -342,7 +342,7 @@ const BoardColumn = ({ column, units, onOpenUnit, onStartWork }) => {
   return (
     <div
       ref={setNodeRef}
-      className={`w-[300px] rounded-2xl border bg-[#1A1A23] flex flex-col ${colors[column.color]}`}
+      className={`w-[300px] rounded-2xl border bg-[#151922] flex flex-col ${colors[column.color]}`}
       data-testid={`column-${column.id}`}
     >
       <div className="p-4 border-b border-white/10 flex items-center justify-between">

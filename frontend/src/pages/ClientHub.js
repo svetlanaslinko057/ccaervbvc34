@@ -2,311 +2,269 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, API } from '@/App';
 import axios from 'axios';
-import {
-  FolderKanban,
-  Package,
-  CheckCircle2,
-  ChevronRight,
-  ArrowRight,
-  LifeBuoy,
-  Plus,
-  AlertCircle,
-  Clock,
-  Zap
-} from 'lucide-react';
+import { ArrowRight, Sparkles, Zap, Clock, CheckCircle2, MessageCircle, ChevronRight, Layers, Calendar, DollarSign } from 'lucide-react';
 
 const ClientHub = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  
+  const [idea, setIdea] = useState('');
   const [projects, setProjects] = useState([]);
-  const [deliverables, setDeliverables] = useState([]);
-  const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [projectsRes, ticketsRes] = await Promise.all([
-          axios.get(`${API}/projects/mine`, { withCredentials: true }),
-          axios.get(`${API}/client/support-tickets`, { withCredentials: true }).catch(() => ({ data: [] }))
-        ]);
-        setProjects(projectsRes.data);
-        setTickets(ticketsRes.data || []);
-        
-        // Fetch deliverables
-        const allDeliverables = [];
-        for (const project of projectsRes.data) {
-          try {
-            const dlvRes = await axios.get(`${API}/projects/${project.project_id}/deliverables`, { withCredentials: true });
-            allDeliverables.push(...dlvRes.data.map(d => ({ ...d, project_name: project.name })));
-          } catch (e) {}
-        }
-        setDeliverables(allDeliverables);
-      } catch (error) {
-        console.error('Error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+    fetchProjects();
   }, []);
 
-  const pendingDeliverables = deliverables.filter(d => d.status === 'pending');
-  const activeProjects = projects.filter(p => p.status === 'active');
-  const openTickets = tickets.filter(t => t.status === 'open' || t.status === 'in_progress');
+  const fetchProjects = async () => {
+    try {
+      const res = await axios.get(`${API}/projects/mine`, { withCredentials: true });
+      setProjects(res.data);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-2 border-white/10 border-t-blue-500 rounded-full animate-spin" />
-      </div>
-    );
-  }
+  const handleStartProject = async () => {
+    if (!idea.trim() || submitting) return;
+    setSubmitting(true);
+    
+    try {
+      await axios.post(`${API}/requests`, {
+        title: idea.slice(0, 100),
+        description: idea,
+        business_idea: idea,
+      }, { withCredentials: true });
+      
+      setIdea('');
+      fetchProjects();
+    } catch (err) {
+      alert(err.response?.data?.detail || 'Failed to create project');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const activeProject = projects.find(p => ['active', 'in_progress', 'discovery', 'scope', 'design', 'development'].includes(p.status || p.current_stage));
 
   return (
-    <div className="min-h-screen p-8" data-testid="client-hub">
-      {/* Background */}
-      <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none" />
-      
-      {/* Header */}
-      <div className="relative mb-10">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Welcome back, {user?.name?.split(' ')[0] || 'Client'}
-        </h1>
-        <p className="text-white/40 mt-2">Here's what needs your attention</p>
-      </div>
-
-      {/* Pending Approvals Alert */}
-      {pendingDeliverables.length > 0 && (
-        <div className="rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 to-transparent p-6 mb-8" data-testid="pending-section">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center">
-                <Package className="w-6 h-6 text-amber-400" />
+    <div className="min-h-screen p-8 max-w-5xl mx-auto" data-testid="client-hub">
+      {/* Hero Section */}
+      <section className="mb-12">
+        <div className="rounded-3xl bg-gradient-to-br from-[#1a1f35] to-[#0f1219] border border-white/10 p-10 relative overflow-hidden">
+          {/* Glow Effect */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-violet-500/10 rounded-full blur-[100px] pointer-events-none" />
+          
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-6">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-white" />
               </div>
-              <div>
-                <h3 className="font-semibold text-amber-400">Awaiting Your Approval</h3>
-                <p className="text-amber-400/70 text-sm">{pendingDeliverables.length} deliverable{pendingDeliverables.length > 1 ? 's' : ''} ready for review</p>
+              <span className="text-sm font-medium text-white/60">AI Product Builder</span>
+            </div>
+            
+            <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mb-4 leading-tight">
+              What do you want<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-violet-400 to-blue-400">to build?</span>
+            </h1>
+            
+            <p className="text-lg text-white/50 mb-8 max-w-xl">
+              Describe your idea and we'll structure it into features, timeline and start building.
+            </p>
+
+            {/* Input */}
+            <div className="relative mb-6">
+              <textarea
+                value={idea}
+                onChange={(e) => setIdea(e.target.value)}
+                placeholder="Build me a marketplace for vintage cars where sellers can list vehicles with history, buyers can browse and make offers..."
+                className="w-full h-32 bg-[#0d1117] border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-white/30 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 resize-none text-lg transition-all"
+                data-testid="idea-input"
+              />
+            </div>
+
+            <button
+              onClick={handleStartProject}
+              disabled={!idea.trim() || submitting}
+              className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white font-semibold rounded-xl flex items-center gap-3 transition-all shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
+              data-testid="start-project-btn"
+            >
+              {submitting ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Creating...
+                </span>
+              ) : (
+                <>
+                  Start Project
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
+            </button>
+
+            {/* What we do */}
+            <div className="mt-8 pt-8 border-t border-white/10">
+              <p className="text-sm text-white/40 mb-4">We will:</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <FeaturePill icon={<Layers className="w-4 h-4" />} text="Break into features" />
+                <FeaturePill icon={<Calendar className="w-4 h-4" />} text="Define timeline" />
+                <FeaturePill icon={<DollarSign className="w-4 h-4" />} text="Estimate cost" />
+                <FeaturePill icon={<Zap className="w-4 h-4" />} text="Start building" />
               </div>
             </div>
-            <button
-              onClick={() => navigate(`/client/deliverable/${pendingDeliverables[0].deliverable_id}`)}
-              className="px-5 py-2.5 bg-amber-500 text-black font-medium rounded-xl hover:bg-amber-400 transition-all"
-              data-testid={`review-${pendingDeliverables[0].deliverable_id}`}
-            >
-              Review Now
-            </button>
           </div>
         </div>
+      </section>
+
+      {/* Active Project */}
+      {activeProject && (
+        <section className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <Zap className="w-5 h-5 text-blue-400" />
+              Active Project
+            </h2>
+          </div>
+          
+          <button
+            onClick={() => navigate(`/client/projects/${activeProject.project_id}`)}
+            className="w-full text-left rounded-2xl bg-[#151922] border border-white/10 p-6 hover:border-blue-500/30 hover:bg-[#1a1f2a] transition-all group"
+            data-testid={`project-${activeProject.project_id}`}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-xl font-semibold group-hover:text-blue-400 transition-colors">{activeProject.name}</h3>
+                <ProjectStatus status={activeProject.current_stage || activeProject.status} />
+              </div>
+              <ChevronRight className="w-5 h-5 text-white/30 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
+            </div>
+            
+            <ProjectProgress stage={activeProject.current_stage} />
+          </button>
+        </section>
       )}
 
-      {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
-        <StatCard 
-          label="Active Projects" 
-          value={activeProjects.length}
-          icon={<FolderKanban className="w-5 h-5" />}
-          color="blue"
-        />
-        <StatCard 
-          label="Pending Approval" 
-          value={pendingDeliverables.length}
-          icon={<Package className="w-5 h-5" />}
-          color="amber"
-          highlight={pendingDeliverables.length > 0}
-        />
-        <StatCard 
-          label="Open Tickets" 
-          value={openTickets.length}
-          icon={<LifeBuoy className="w-5 h-5" />}
-          color="blue"
-        />
-        <StatCard 
-          label="Completed" 
-          value={projects.filter(p => p.status === 'completed').length}
-          icon={<CheckCircle2 className="w-5 h-5" />}
-          color="emerald"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Projects */}
-        <div className="lg:col-span-2">
-          <div className="rounded-2xl border border-white/10 bg-[#1A1A23] overflow-hidden">
-            <div className="p-5 border-b border-white/10 bg-white/[0.03] flex items-center justify-between">
-              <h3 className="font-semibold flex items-center gap-2">
-                <FolderKanban className="w-4 h-4 text-white/40" />
-                Active Projects
-              </h3>
-              <button 
-                onClick={() => navigate('/client/projects')}
-                className="text-sm text-white/40 hover:text-white flex items-center gap-1 transition-colors"
-              >
-                View all <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-            
-            {activeProjects.length === 0 ? (
-              <div className="p-12 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-white/5 mx-auto mb-4 flex items-center justify-center">
-                  <FolderKanban className="w-8 h-8 text-white/20" />
-                </div>
-                <h4 className="font-semibold mb-2">No active projects</h4>
-                <p className="text-sm text-white/40 mb-6">Start your first project request</p>
-                <button
-                  onClick={() => navigate('/client/request/new')}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-all shadow-lg shadow-blue-600/20"
-                  data-testid="new-project-btn"
-                >
-                  <Plus className="w-4 h-4" />
-                  New Project
-                </button>
-              </div>
-            ) : (
-              <div className="divide-y divide-white/10">
-                {activeProjects.slice(0, 4).map((project) => (
-                  <ProjectRow 
-                    key={project.project_id}
-                    project={project}
-                    onClick={() => navigate(`/client/projects/${project.project_id}`)}
-                  />
-                ))}
-              </div>
-            )}
+      {/* Projects List */}
+      {projects.length > 0 && (
+        <section className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Your Projects</h2>
+            <span className="text-sm text-white/40">{projects.length} total</span>
           </div>
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Support */}
-          <div className="rounded-2xl border border-white/10 bg-[#1A1A23] overflow-hidden">
-            <div className="p-5 border-b border-white/10 bg-white/[0.03] flex items-center justify-between">
-              <h3 className="font-semibold flex items-center gap-2">
-                <LifeBuoy className="w-4 h-4 text-white/40" />
-                Support
-              </h3>
-              {openTickets.length > 0 && (
-                <span className="px-2 py-0.5 text-xs bg-blue-500/10 text-blue-400 rounded-lg border border-blue-500/20">
-                  {openTickets.length} open
-                </span>
-              )}
-            </div>
-            
-            {tickets.length === 0 ? (
-              <div className="p-8 text-center">
-                <p className="text-sm text-white/40">No support tickets</p>
-              </div>
-            ) : (
-              <div className="divide-y divide-white/10">
-                {tickets.slice(0, 3).map(ticket => (
-                  <div key={ticket.ticket_id} className="p-4">
-                    <h4 className="text-sm font-medium truncate">{ticket.title}</h4>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-xs text-white/40 capitalize">{ticket.ticket_type}</span>
-                      <span className={`px-2 py-0.5 text-xs rounded-lg ${
-                        ticket.status === 'open' ? 'bg-amber-500/10 text-amber-400' :
-                        ticket.status === 'in_progress' ? 'bg-blue-500/10 text-blue-400' :
-                        'bg-emerald-500/10 text-emerald-400'
-                      }`}>
-                        {ticket.status.replace('_', ' ')}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            
-            <div className="p-4 border-t border-white/10">
-              <button
-                onClick={() => navigate('/client/support')}
-                className="w-full py-2.5 border border-white/10 rounded-xl text-sm text-white/60 hover:text-white hover:border-white/20 transition-all"
-              >
-                View All Tickets
-              </button>
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="rounded-2xl border border-white/10 bg-[#1A1A23] p-5">
-            <h3 className="font-semibold mb-4">Quick Actions</h3>
-            <div className="space-y-2">
-              <ActionButton 
-                icon={<Plus className="w-4 h-4" />}
-                label="New Project"
-                onClick={() => navigate('/client/request/new')}
+          
+          <div className="space-y-3">
+            {projects.slice(0, 5).map(project => (
+              <ProjectCard 
+                key={project.project_id} 
+                project={project} 
+                onClick={() => navigate(`/client/projects/${project.project_id}`)}
               />
-              <ActionButton 
-                icon={<LifeBuoy className="w-4 h-4" />}
-                label="Get Support"
-                onClick={() => navigate('/client/support')}
-              />
-            </div>
+            ))}
           </div>
-        </div>
-      </div>
+          
+          {projects.length > 5 && (
+            <button
+              onClick={() => navigate('/client/projects')}
+              className="w-full mt-4 py-3 text-center text-sm text-white/50 hover:text-white border border-white/10 rounded-xl hover:border-white/20 transition-all"
+            >
+              View all {projects.length} projects
+            </button>
+          )}
+        </section>
+      )}
+
+      {/* Empty State */}
+      {!loading && projects.length === 0 && (
+        <section className="rounded-2xl bg-[#151922] border border-white/10 p-12 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/20 to-violet-500/20 mx-auto mb-6 flex items-center justify-center">
+            <Sparkles className="w-8 h-8 text-blue-400" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">You haven't built anything yet</h3>
+          <p className="text-white/50 mb-6 max-w-md mx-auto">
+            Start your first product in 2 minutes. Describe your idea above and we'll break it into features, timeline and cost.
+          </p>
+        </section>
+      )}
     </div>
   );
 };
 
-const StatCard = ({ label, value, icon, color, highlight }) => {
-  const colors = {
-    blue: 'text-blue-400',
-    amber: 'text-amber-400',
-    emerald: 'text-emerald-400'
-  };
-  
+const FeaturePill = ({ icon, text }) => (
+  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border border-white/5">
+    <span className="text-blue-400">{icon}</span>
+    <span className="text-sm text-white/70">{text}</span>
+  </div>
+);
+
+const ProjectStatus = ({ status }) => {
+  const config = {
+    discovery: { label: 'AI structuring...', color: 'text-violet-400', animate: true },
+    scope: { label: 'Scope ready', color: 'text-blue-400' },
+    design: { label: 'In design', color: 'text-cyan-400' },
+    development: { label: 'In development', color: 'text-emerald-400' },
+    qa: { label: 'Quality check', color: 'text-amber-400' },
+    delivery: { label: 'Ready for delivery', color: 'text-green-400' },
+    completed: { label: 'Completed', color: 'text-emerald-400' },
+    active: { label: 'Active', color: 'text-blue-400' },
+  }[status] || { label: status, color: 'text-white/50' };
+
   return (
-    <div className={`p-5 rounded-2xl border bg-[#1A1A23] transition-all ${
-      highlight ? 'border-amber-500/40 bg-gradient-to-br from-amber-500/15 to-[#1A1A23]' : 'border-white/10'
-    }`}>
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-medium text-white/50 uppercase tracking-wide">{label}</span>
-        <span className={colors[color]}>{icon}</span>
-      </div>
-      <div className="text-3xl font-semibold text-white">{value}</div>
+    <div className={`flex items-center gap-2 mt-1 text-sm ${config.color}`}>
+      {config.animate && <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />}
+      {config.label}
     </div>
   );
 };
 
-const ProjectRow = ({ project, onClick }) => {
+const ProjectProgress = ({ stage }) => {
   const stages = ['discovery', 'scope', 'design', 'development', 'qa', 'delivery'];
-  const progress = Math.round(((stages.indexOf(project.current_stage) + 1) / stages.length) * 100);
-  
+  const currentIndex = stages.indexOf(stage) + 1;
+  const progress = Math.round((currentIndex / stages.length) * 100);
+
+  return (
+    <div>
+      <div className="flex items-center justify-between text-sm mb-2">
+        <span className="text-white/40">Progress</span>
+        <span className="text-white/60 font-mono">{progress}%</span>
+      </div>
+      <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+        <div 
+          className="h-full bg-gradient-to-r from-blue-500 to-violet-500 rounded-full transition-all duration-500"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+    </div>
+  );
+};
+
+const ProjectCard = ({ project, onClick }) => {
+  const stages = ['discovery', 'scope', 'design', 'development', 'qa', 'delivery'];
+  const currentIndex = stages.indexOf(project.current_stage) + 1;
+  const progress = Math.round((currentIndex / stages.length) * 100);
+
   return (
     <button
       onClick={onClick}
-      className="w-full text-left p-5 hover:bg-white/[0.02] transition-all group"
-      data-testid={`project-${project.project_id}`}
+      className="w-full text-left p-4 rounded-xl bg-[#151922] border border-white/10 hover:border-white/20 hover:bg-[#1a1f2a] transition-all group flex items-center gap-4"
     >
-      <div className="flex items-center justify-between mb-3">
-        <h4 className="font-medium group-hover:text-blue-400 transition-colors">{project.name}</h4>
-        <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-blue-400 transition-colors" />
+      <div className="flex-1 min-w-0">
+        <h4 className="font-medium truncate group-hover:text-blue-400 transition-colors">{project.name}</h4>
+        <p className="text-sm text-white/40 capitalize">{project.current_stage}</p>
       </div>
-      <div className="flex items-center gap-4">
-        <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+      <div className="w-24">
+        <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
           <div 
-            className="h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full transition-all"
+            className="h-full bg-gradient-to-r from-blue-500 to-violet-500 rounded-full"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <span className="text-sm text-white/40 font-mono">{progress}%</span>
       </div>
-      <p className="text-xs text-white/40 mt-2 capitalize">Stage: {project.current_stage}</p>
+      <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-blue-400 transition-colors" />
     </button>
   );
 };
-
-const ActionButton = ({ icon, label, onClick }) => (
-  <button
-    onClick={onClick}
-    className="w-full p-3 border border-white/10 rounded-xl flex items-center gap-3 text-sm hover:bg-white/[0.05] hover:border-white/20 transition-all"
-  >
-    <div className="w-8 h-8 rounded-lg bg-white/[0.08] flex items-center justify-center text-white/60">
-      {icon}
-    </div>
-    {label}
-  </button>
-);
 
 export default ClientHub;
