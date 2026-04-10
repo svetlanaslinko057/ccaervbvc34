@@ -11,7 +11,8 @@ import {
   LifeBuoy,
   Plus,
   AlertCircle,
-  Clock
+  Clock,
+  Zap
 } from 'lucide-react';
 
 const ClientHub = () => {
@@ -58,77 +59,89 @@ const ClientHub = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-white/10 border-t-blue-500 rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="p-8" data-testid="client-hub">
+    <div className="min-h-screen p-8" data-testid="client-hub">
+      {/* Background */}
+      <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none" />
+      
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-medium tracking-tight">
+      <div className="relative mb-10">
+        <h1 className="text-3xl font-semibold tracking-tight">
           Welcome back, {user?.name?.split(' ')[0] || 'Client'}
         </h1>
-        <p className="text-white/50 mt-1">Here's what needs your attention</p>
+        <p className="text-white/40 mt-2">Here's what needs your attention</p>
       </div>
 
       {/* Pending Approvals Alert */}
       {pendingDeliverables.length > 0 && (
-        <div className="card mb-8 border-white/30" data-testid="pending-section">
-          <div className="p-4 border-b border-white/10 flex items-center gap-3">
-            <div className="w-8 h-8 rounded-[6px] bg-white/10 flex items-center justify-center">
-              <AlertCircle className="w-4 h-4" />
-            </div>
-            <div>
-              <span className="font-medium">Awaiting Approval</span>
-              <span className="text-white/40 text-sm ml-2">{pendingDeliverables.length} pending</span>
-            </div>
-          </div>
-          <div className="divide-y divide-white/5">
-            {pendingDeliverables.slice(0, 3).map(dlv => (
-              <div 
-                key={dlv.deliverable_id}
-                className="p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
-              >
-                <div>
-                  <h4 className="font-medium">{dlv.title}</h4>
-                  <p className="text-sm text-white/40">{dlv.project_name} · {dlv.version}</p>
-                </div>
-                <button
-                  onClick={() => navigate(`/client/deliverable/${dlv.deliverable_id}`)}
-                  className="btn btn-primary btn-sm"
-                  data-testid={`review-${dlv.deliverable_id}`}
-                >
-                  Review
-                  <ArrowRight className="w-3 h-3" />
-                </button>
+        <div className="rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 to-transparent p-6 mb-8" data-testid="pending-section">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                <Package className="w-6 h-6 text-amber-400" />
               </div>
-            ))}
+              <div>
+                <h3 className="font-semibold text-amber-400">Awaiting Your Approval</h3>
+                <p className="text-amber-400/70 text-sm">{pendingDeliverables.length} deliverable{pendingDeliverables.length > 1 ? 's' : ''} ready for review</p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate(`/client/deliverable/${pendingDeliverables[0].deliverable_id}`)}
+              className="px-5 py-2.5 bg-amber-500 text-black font-medium rounded-xl hover:bg-amber-400 transition-all"
+              data-testid={`review-${pendingDeliverables[0].deliverable_id}`}
+            >
+              Review Now
+            </button>
           </div>
         </div>
       )}
 
       {/* Stats */}
-      <div className="stats-grid mb-8">
-        <StatCard label="Active Projects" value={activeProjects.length} />
-        <StatCard label="Pending" value={pendingDeliverables.length} highlight={pendingDeliverables.length > 0} />
-        <StatCard label="Open Tickets" value={openTickets.length} />
-        <StatCard label="Completed" value={projects.filter(p => p.status === 'completed').length} />
+      <div className="grid grid-cols-4 gap-4 mb-8">
+        <StatCard 
+          label="Active Projects" 
+          value={activeProjects.length}
+          icon={<FolderKanban className="w-5 h-5" />}
+          color="blue"
+        />
+        <StatCard 
+          label="Pending Approval" 
+          value={pendingDeliverables.length}
+          icon={<Package className="w-5 h-5" />}
+          color="amber"
+          highlight={pendingDeliverables.length > 0}
+        />
+        <StatCard 
+          label="Open Tickets" 
+          value={openTickets.length}
+          icon={<LifeBuoy className="w-5 h-5" />}
+          color="blue"
+        />
+        <StatCard 
+          label="Completed" 
+          value={projects.filter(p => p.status === 'completed').length}
+          icon={<CheckCircle2 className="w-5 h-5" />}
+          color="emerald"
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Projects */}
         <div className="lg:col-span-2">
-          <div className="card">
-            <div className="p-4 border-b border-white/10 flex items-center justify-between">
-              <h3 className="font-medium flex items-center gap-2">
+          <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] overflow-hidden">
+            <div className="p-5 border-b border-white/[0.06] bg-white/[0.02] flex items-center justify-between">
+              <h3 className="font-semibold flex items-center gap-2">
                 <FolderKanban className="w-4 h-4 text-white/40" />
                 Active Projects
               </h3>
               <button 
                 onClick={() => navigate('/client/projects')}
-                className="text-sm text-white/40 hover:text-white flex items-center gap-1"
+                className="text-sm text-white/40 hover:text-white flex items-center gap-1 transition-colors"
               >
                 View all <ChevronRight className="w-4 h-4" />
               </button>
@@ -136,12 +149,14 @@ const ClientHub = () => {
             
             {activeProjects.length === 0 ? (
               <div className="p-12 text-center">
-                <FolderKanban className="w-10 h-10 text-white/20 mx-auto mb-4" />
-                <h4 className="font-medium mb-2">No active projects</h4>
+                <div className="w-16 h-16 rounded-2xl bg-white/5 mx-auto mb-4 flex items-center justify-center">
+                  <FolderKanban className="w-8 h-8 text-white/20" />
+                </div>
+                <h4 className="font-semibold mb-2">No active projects</h4>
                 <p className="text-sm text-white/40 mb-6">Start your first project request</p>
                 <button
                   onClick={() => navigate('/client/request/new')}
-                  className="btn btn-primary"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-all shadow-lg shadow-blue-600/20"
                   data-testid="new-project-btn"
                 >
                   <Plus className="w-4 h-4" />
@@ -149,7 +164,7 @@ const ClientHub = () => {
                 </button>
               </div>
             ) : (
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-white/[0.06]">
                 {activeProjects.slice(0, 4).map((project) => (
                   <ProjectRow 
                     key={project.project_id}
@@ -165,30 +180,36 @@ const ClientHub = () => {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Support */}
-          <div className="card">
-            <div className="p-4 border-b border-white/10 flex items-center justify-between">
-              <h3 className="font-medium flex items-center gap-2">
+          <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] overflow-hidden">
+            <div className="p-5 border-b border-white/[0.06] bg-white/[0.02] flex items-center justify-between">
+              <h3 className="font-semibold flex items-center gap-2">
                 <LifeBuoy className="w-4 h-4 text-white/40" />
                 Support
               </h3>
               {openTickets.length > 0 && (
-                <span className="badge badge-mono">{openTickets.length}</span>
+                <span className="px-2 py-0.5 text-xs bg-blue-500/10 text-blue-400 rounded-lg border border-blue-500/20">
+                  {openTickets.length} open
+                </span>
               )}
             </div>
             
             {tickets.length === 0 ? (
-              <div className="p-6 text-center">
-                <p className="text-sm text-white/40">No tickets</p>
+              <div className="p-8 text-center">
+                <p className="text-sm text-white/40">No support tickets</p>
               </div>
             ) : (
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-white/[0.06]">
                 {tickets.slice(0, 3).map(ticket => (
                   <div key={ticket.ticket_id} className="p-4">
                     <h4 className="text-sm font-medium truncate">{ticket.title}</h4>
-                    <div className="flex items-center justify-between mt-1">
-                      <span className="text-xs text-white/40">{ticket.ticket_type}</span>
-                      <span className={`badge badge-mono ${ticket.status === 'open' ? '' : 'badge-active'}`}>
-                        {ticket.status}
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-xs text-white/40 capitalize">{ticket.ticket_type}</span>
+                      <span className={`px-2 py-0.5 text-xs rounded-lg ${
+                        ticket.status === 'open' ? 'bg-amber-500/10 text-amber-400' :
+                        ticket.status === 'in_progress' ? 'bg-blue-500/10 text-blue-400' :
+                        'bg-emerald-500/10 text-emerald-400'
+                      }`}>
+                        {ticket.status.replace('_', ' ')}
                       </span>
                     </div>
                   </div>
@@ -196,10 +217,10 @@ const ClientHub = () => {
               </div>
             )}
             
-            <div className="p-4 border-t border-white/10">
+            <div className="p-4 border-t border-white/[0.06]">
               <button
                 onClick={() => navigate('/client/support')}
-                className="btn btn-secondary btn-sm w-full justify-center"
+                className="w-full py-2.5 border border-white/10 rounded-xl text-sm text-white/60 hover:text-white hover:border-white/20 transition-all"
               >
                 View All Tickets
               </button>
@@ -207,8 +228,8 @@ const ClientHub = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="card p-4">
-            <h3 className="font-medium mb-4">Quick Actions</h3>
+          <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0F] p-5">
+            <h3 className="font-semibold mb-4">Quick Actions</h3>
             <div className="space-y-2">
               <ActionButton 
                 icon={<Plus className="w-4 h-4" />}
@@ -228,12 +249,25 @@ const ClientHub = () => {
   );
 };
 
-const StatCard = ({ label, value, highlight }) => (
-  <div className={`stat-card ${highlight ? 'border-white/40' : ''}`}>
-    <div className="stat-value">{value}</div>
-    <div className="stat-label">{label}</div>
-  </div>
-);
+const StatCard = ({ label, value, icon, color, highlight }) => {
+  const colors = {
+    blue: 'text-blue-400',
+    amber: 'text-amber-400',
+    emerald: 'text-emerald-400'
+  };
+  
+  return (
+    <div className={`p-5 rounded-2xl border bg-[#0A0A0F] transition-all ${
+      highlight ? 'border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-transparent' : 'border-white/[0.06]'
+    }`}>
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs font-medium text-white/40 uppercase tracking-wide">{label}</span>
+        <span className={colors[color]}>{icon}</span>
+      </div>
+      <div className="text-3xl font-semibold text-white">{value}</div>
+    </div>
+  );
+};
 
 const ProjectRow = ({ project, onClick }) => {
   const stages = ['discovery', 'scope', 'design', 'development', 'qa', 'delivery'];
@@ -242,23 +276,23 @@ const ProjectRow = ({ project, onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left p-4 hover:bg-white/5 transition-colors group"
+      className="w-full text-left p-5 hover:bg-white/[0.02] transition-all group"
       data-testid={`project-${project.project_id}`}
     >
       <div className="flex items-center justify-between mb-3">
-        <h4 className="font-medium group-hover:text-white transition-colors">{project.name}</h4>
-        <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/50" />
+        <h4 className="font-medium group-hover:text-blue-400 transition-colors">{project.name}</h4>
+        <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-blue-400 transition-colors" />
       </div>
-      <div className="flex items-center gap-3">
-        <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+      <div className="flex items-center gap-4">
+        <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
           <div 
-            className="h-full bg-white rounded-full"
+            className="h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full transition-all"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <span className="text-mono text-xs text-white/40">{progress}%</span>
+        <span className="text-sm text-white/40 font-mono">{progress}%</span>
       </div>
-      <p className="text-xs text-white/40 mt-2 capitalize">{project.current_stage}</p>
+      <p className="text-xs text-white/40 mt-2 capitalize">Stage: {project.current_stage}</p>
     </button>
   );
 };
@@ -266,9 +300,9 @@ const ProjectRow = ({ project, onClick }) => {
 const ActionButton = ({ icon, label, onClick }) => (
   <button
     onClick={onClick}
-    className="w-full p-3 border border-white/10 rounded-[8px] flex items-center gap-3 text-sm hover:bg-white/5 hover:border-white/20 transition-all"
+    className="w-full p-3 border border-white/[0.06] rounded-xl flex items-center gap-3 text-sm hover:bg-white/[0.02] hover:border-white/10 transition-all"
   >
-    <div className="w-8 h-8 rounded-[6px] bg-white/5 flex items-center justify-center text-white/60">
+    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/50">
       {icon}
     </div>
     {label}

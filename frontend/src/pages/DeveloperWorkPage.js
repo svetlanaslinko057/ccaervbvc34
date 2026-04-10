@@ -13,7 +13,9 @@ import {
   Link as LinkIcon,
   Loader2,
   FileText,
-  Folder
+  Folder,
+  Timer,
+  ChevronRight
 } from 'lucide-react';
 
 const DeveloperWorkPage = () => {
@@ -116,16 +118,25 @@ const DeveloperWorkPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+      <div className="flex items-center justify-center h-64">
+        <div className="w-8 h-8 border-2 border-white/10 border-t-blue-500 rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!workUnit) {
     return (
-      <div className="p-6">
-        <p className="text-zinc-500">Work unit not found</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 text-white/30 mx-auto mb-4" />
+          <p className="text-white/50">Work unit not found</p>
+          <button 
+            onClick={() => navigate('/developer/assignments')}
+            className="mt-4 text-blue-400 hover:text-blue-300"
+          >
+            Back to Assignments
+          </button>
+        </div>
       </div>
     );
   }
@@ -142,37 +153,56 @@ const DeveloperWorkPage = () => {
   const latestSubmission = submissions[submissions.length - 1];
 
   return (
-    <div className="p-6" data-testid="developer-work-page">
-      {/* Back Button */}
+    <div className="min-h-screen p-8" data-testid="developer-work-page">
+      {/* Background */}
+      <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none" />
+      
+      {/* Breadcrumb */}
       <button
         onClick={() => navigate('/developer/assignments')}
-        className="flex items-center gap-2 text-zinc-500 hover:text-white text-sm mb-6 transition-colors"
+        className="relative flex items-center gap-2 text-white/50 hover:text-white text-sm mb-8 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to Assignments
       </button>
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="relative grid grid-cols-3 gap-8 max-w-6xl">
         {/* LEFT COLUMN - Main Work */}
-        <div className="col-span-2 space-y-4">
+        <div className="col-span-2 space-y-6">
           {/* Header */}
-          <div>
-            <h1 className="text-xl font-semibold">{workUnit.title}</h1>
-            <div className="flex items-center gap-2 mt-1 text-sm text-zinc-500">
-              <span className="capitalize">{workUnit.unit_type || 'Task'}</span>
-              <span>·</span>
-              <span>{workUnit.estimated_hours}h estimated</span>
+          <div className="flex items-start gap-4">
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
+              isRevision ? 'bg-red-500/10 border border-red-500/20' :
+              isCompleted ? 'bg-emerald-500/10 border border-emerald-500/20' :
+              isSubmitted ? 'bg-amber-500/10 border border-amber-500/20' :
+              'bg-blue-500/10 border border-blue-500/20'
+            }`}>
+              {isRevision && <AlertCircle className="w-6 h-6 text-red-400" />}
+              {isCompleted && <CheckCircle2 className="w-6 h-6 text-emerald-400" />}
+              {isSubmitted && <Clock className="w-6 h-6 text-amber-400" />}
+              {!isRevision && !isCompleted && !isSubmitted && <Play className="w-6 h-6 text-blue-400" />}
+            </div>
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight">{workUnit.title}</h1>
+              <div className="flex items-center gap-3 mt-2 text-sm text-white/40">
+                <span className="capitalize">{workUnit.unit_type || 'Task'}</span>
+                <span className="w-1 h-1 rounded-full bg-white/20" />
+                <span>{workUnit.estimated_hours}h estimated</span>
+              </div>
             </div>
           </div>
 
           {/* Revision Alert */}
           {isRevision && latestSubmission && (
-            <Card title="Revision Required" variant="error">
-              <p className="text-zinc-400 text-sm mb-2">Fix the following issues:</p>
-              <div className="text-red-400 text-sm">
-                {latestSubmission.feedback || 'Review feedback and make necessary changes'}
+            <div className="rounded-2xl border border-red-500/30 bg-gradient-to-r from-red-500/10 to-transparent p-6">
+              <div className="flex items-center gap-3 mb-3">
+                <AlertCircle className="w-5 h-5 text-red-400" />
+                <h3 className="font-semibold text-red-400">Revision Required</h3>
               </div>
-            </Card>
+              <p className="text-white/60 text-sm">
+                {latestSubmission.feedback || 'Review feedback and make necessary changes'}
+              </p>
+            </div>
           )}
 
           {/* Start Work Button */}
@@ -180,49 +210,60 @@ const DeveloperWorkPage = () => {
             <button
               onClick={handleStartWork}
               disabled={actionLoading}
-              className="w-full bg-white text-black rounded-xl p-4 font-medium flex items-center justify-center gap-2 hover:bg-zinc-200 disabled:opacity-50 transition-all"
+              className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-2xl p-5 font-semibold flex items-center justify-center gap-3 transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50"
               data-testid="start-work-btn"
             >
-              {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Play className="w-5 h-5" /> Start Work</>}
+              {actionLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>
+                  <Play className="w-5 h-5" />
+                  Start Working
+                </>
+              )}
             </button>
           )}
 
           {/* Task Description */}
-          <Card title="Task">
-            <p className="text-zinc-300">{workUnit.description || 'No description provided'}</p>
+          <Card title="Task Description">
+            <p className="text-white/70 leading-relaxed">
+              {workUnit.description || 'No description provided'}
+            </p>
           </Card>
 
           {/* Requirements */}
           {workUnit.requirements && (
             <Card title="Requirements">
-              <p className="text-zinc-300 whitespace-pre-wrap">{workUnit.requirements}</p>
+              <p className="text-white/70 whitespace-pre-wrap leading-relaxed">{workUnit.requirements}</p>
             </Card>
           )}
 
           {/* Log Work */}
           {canLog && (
-            <Card title="Log Work">
-              <form onSubmit={handleLogWork} className="space-y-3">
-                <div className="grid grid-cols-4 gap-3">
+            <Card title="Log Work" icon={<Timer className="w-4 h-4 text-blue-400" />}>
+              <form onSubmit={handleLogWork} className="space-y-4">
+                <div className="grid grid-cols-4 gap-4">
                   <div>
+                    <label className="text-xs font-medium text-white/40 uppercase tracking-wide block mb-2">Hours</label>
                     <input
                       type="number"
                       step="0.5"
                       min="0.5"
                       value={logHours}
                       onChange={(e) => setLogHours(e.target.value)}
-                      placeholder="Hours"
-                      className="w-full bg-black border border-zinc-800 rounded-lg p-2 text-white text-sm focus:border-zinc-600 outline-none"
+                      placeholder="0.5"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-blue-500/50 transition-all"
                       data-testid="log-hours-input"
                     />
                   </div>
                   <div className="col-span-3">
+                    <label className="text-xs font-medium text-white/40 uppercase tracking-wide block mb-2">Description</label>
                     <input
                       type="text"
                       value={logDescription}
                       onChange={(e) => setLogDescription(e.target.value)}
-                      placeholder="What did you do?"
-                      className="w-full bg-black border border-zinc-800 rounded-lg p-2 text-white text-sm focus:border-zinc-600 outline-none"
+                      placeholder="What did you work on?"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-blue-500/50 transition-all"
                       data-testid="log-description-input"
                     />
                   </div>
@@ -230,11 +271,11 @@ const DeveloperWorkPage = () => {
                 <button
                   type="submit"
                   disabled={actionLoading || !logHours || !logDescription.trim()}
-                  className="bg-zinc-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-zinc-700 disabled:opacity-50 transition-all flex items-center gap-2"
+                  className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-white/70 font-medium hover:bg-white/10 hover:border-white/20 disabled:opacity-50 transition-all flex items-center gap-2"
                   data-testid="log-work-btn"
                 >
                   <Plus className="w-4 h-4" />
-                  Log
+                  Log Hours
                 </button>
               </form>
             </Card>
@@ -242,16 +283,16 @@ const DeveloperWorkPage = () => {
 
           {/* Work Logs */}
           {workLogs.length > 0 && (
-            <Card title={`Work Log (${totalHours}h total)`}>
-              <div className="space-y-2">
+            <Card title={`Work Log`} badge={`${totalHours}h total`}>
+              <div className="space-y-3">
                 {workLogs.map((log, i) => (
-                  <div key={log.log_id || i} className="flex items-start gap-3 text-sm">
-                    <div className="w-10 h-10 bg-zinc-800 rounded-lg flex items-center justify-center text-xs font-bold">
+                  <div key={log.log_id || i} className="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                    <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center font-bold text-blue-400">
                       {log.hours}h
                     </div>
-                    <div className="flex-1">
-                      <p className="text-zinc-300">{log.description}</p>
-                      <p className="text-zinc-600 text-xs mt-0.5">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white/80">{log.description}</p>
+                      <p className="text-white/30 text-xs mt-1">
                         {new Date(log.created_at).toLocaleString()}
                       </p>
                     </div>
@@ -263,50 +304,66 @@ const DeveloperWorkPage = () => {
 
           {/* Submit Work */}
           {canSubmit && (
-            <Card title="Submit Work" variant="submit">
-              <form onSubmit={handleSubmit} className="space-y-3">
-                <textarea
-                  value={submitSummary}
-                  onChange={(e) => setSubmitSummary(e.target.value)}
-                  placeholder="Summary of completed work..."
-                  className="w-full bg-black border border-zinc-800 rounded-lg p-3 text-white text-sm h-24 resize-none focus:border-zinc-600 outline-none"
-                  data-testid="submit-summary-input"
-                />
+            <Card 
+              title="Submit for Review" 
+              icon={<Send className="w-4 h-4 text-blue-400" />}
+              variant="submit"
+            >
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                  <label className="text-xs font-medium text-white/40 uppercase tracking-wide block mb-2">Summary *</label>
+                  <textarea
+                    value={submitSummary}
+                    onChange={(e) => setSubmitSummary(e.target.value)}
+                    placeholder="Describe what you've completed..."
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-blue-500/50 h-28 resize-none transition-all"
+                    data-testid="submit-summary-input"
+                  />
+                </div>
                 
                 <div>
-                  <label className="text-xs text-zinc-500 mb-1 block">Links (optional)</label>
-                  {submitLinks.map((link, i) => (
-                    <div key={i} className="flex items-center gap-2 mb-2">
-                      <LinkIcon className="w-4 h-4 text-zinc-600" />
-                      <input
-                        type="url"
-                        value={link}
-                        onChange={(e) => {
-                          const newLinks = [...submitLinks];
-                          newLinks[i] = e.target.value;
-                          setSubmitLinks(newLinks);
-                        }}
-                        placeholder="https://..."
-                        className="flex-1 bg-black border border-zinc-800 rounded-lg p-2 text-white text-sm focus:border-zinc-600 outline-none"
-                      />
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => setSubmitLinks([...submitLinks, ''])}
-                    className="text-xs text-zinc-500 hover:text-zinc-300"
-                  >
-                    + Add link
-                  </button>
+                  <label className="text-xs font-medium text-white/40 uppercase tracking-wide block mb-2">Links (optional)</label>
+                  <div className="space-y-2">
+                    {submitLinks.map((link, i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <LinkIcon className="w-4 h-4 text-white/30" />
+                        <input
+                          type="url"
+                          value={link}
+                          onChange={(e) => {
+                            const newLinks = [...submitLinks];
+                            newLinks[i] = e.target.value;
+                            setSubmitLinks(newLinks);
+                          }}
+                          placeholder="https://..."
+                          className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-blue-500/50 font-mono text-sm transition-all"
+                        />
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setSubmitLinks([...submitLinks, ''])}
+                      className="text-sm text-white/40 hover:text-white/60 flex items-center gap-1 transition-colors"
+                    >
+                      <Plus className="w-3 h-3" /> Add another link
+                    </button>
+                  </div>
                 </div>
 
                 <button
                   type="submit"
                   disabled={actionLoading || !submitSummary.trim()}
-                  className="w-full bg-white text-black rounded-lg p-3 font-medium flex items-center justify-center gap-2 hover:bg-zinc-200 disabled:opacity-50 transition-all"
+                  className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-xl p-4 font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50"
                   data-testid="submit-work-btn"
                 >
-                  {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Send className="w-5 h-5" /> Submit Work</>}
+                  {actionLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <Send className="w-5 h-5" />
+                      Submit for Review
+                    </>
+                  )}
                 </button>
               </form>
             </Card>
@@ -314,72 +371,102 @@ const DeveloperWorkPage = () => {
 
           {/* Submitted State */}
           {isSubmitted && (
-            <Card title="Status" variant="info">
-              <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5 text-yellow-400" />
+            <div className="rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 to-transparent p-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-amber-400" />
+                </div>
                 <div>
-                  <div className="font-medium">Waiting for review</div>
-                  <p className="text-zinc-500 text-sm">Your work has been submitted and is being reviewed</p>
+                  <h3 className="font-semibold text-amber-400">Waiting for Review</h3>
+                  <p className="text-amber-400/70 text-sm">Your work has been submitted and is being reviewed</p>
                 </div>
               </div>
-            </Card>
+            </div>
           )}
 
           {/* Completed State */}
           {isCompleted && (
-            <Card title="Status" variant="success">
-              <div className="flex items-center gap-3">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+            <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 to-transparent p-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+                </div>
                 <div>
-                  <div className="font-medium text-emerald-400">Completed</div>
-                  <p className="text-zinc-500 text-sm">This task has been completed and validated</p>
+                  <h3 className="font-semibold text-emerald-400">Task Completed</h3>
+                  <p className="text-emerald-400/70 text-sm">This task has been completed and validated</p>
                 </div>
               </div>
-            </Card>
+            </div>
           )}
         </div>
 
         {/* RIGHT COLUMN - Status Panel */}
-        <div className="space-y-4">
+        <div className="space-y-6">
+          {/* Status */}
           <Card title="Status">
             <StatusBadge status={status} />
           </Card>
 
-          <Card title="Time">
-            <div className="text-2xl font-bold">{totalHours}h</div>
-            <div className="text-xs text-zinc-500">of {workUnit.estimated_hours}h estimated</div>
+          {/* Time */}
+          <Card title="Time Tracked">
+            <div className="flex items-end gap-2">
+              <span className="text-4xl font-bold text-white">{totalHours}</span>
+              <span className="text-white/30 text-lg mb-1">/ {workUnit.estimated_hours}h</span>
+            </div>
+            <div className="mt-4">
+              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                <div 
+                  className={`h-full rounded-full transition-all ${
+                    totalHours > workUnit.estimated_hours ? 'bg-red-500' : 'bg-blue-500'
+                  }`}
+                  style={{ width: `${Math.min((totalHours / workUnit.estimated_hours) * 100, 100)}%` }}
+                />
+              </div>
+            </div>
           </Card>
 
+          {/* Project */}
           <Card title="Project">
-            <div className="flex items-center gap-2">
-              <Folder className="w-4 h-4 text-zinc-500" />
-              <span>{workUnit.project_name || 'Project'}</span>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+                <Folder className="w-4 h-4 text-white/50" />
+              </div>
+              <span className="font-medium">{workUnit.project_name || 'Project'}</span>
             </div>
           </Card>
 
           {workUnit.scope_item_name && (
             <Card title="Feature">
-              <div className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-zinc-500" />
-                <span>{workUnit.scope_item_name}</span>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+                  <FileText className="w-4 h-4 text-white/50" />
+                </div>
+                <span className="font-medium">{workUnit.scope_item_name}</span>
               </div>
             </Card>
           )}
 
           {/* Submissions History */}
           {submissions.length > 0 && (
-            <Card title="Submissions">
-              <div className="space-y-2">
+            <Card title="Submission History">
+              <div className="space-y-3">
                 {submissions.map((sub, i) => (
-                  <div key={sub.submission_id} className="text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${
+                  <div key={sub.submission_id} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-2 h-2 rounded-full ${
                         sub.status === 'approved' ? 'bg-emerald-400' :
                         sub.status === 'revision_needed' ? 'bg-red-400' :
-                        'bg-yellow-400'
+                        'bg-amber-400'
                       }`} />
-                      <span className="text-zinc-400">#{i + 1} - {sub.status}</span>
+                      <span className="text-sm text-white/60">#{i + 1}</span>
                     </div>
+                    <span className={`text-xs px-2 py-1 rounded-lg ${
+                      sub.status === 'approved' ? 'bg-emerald-500/10 text-emerald-400' :
+                      sub.status === 'revision_needed' ? 'bg-red-500/10 text-red-400' :
+                      'bg-amber-500/10 text-amber-400'
+                    }`}>
+                      {sub.status.replace('_', ' ')}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -391,41 +478,41 @@ const DeveloperWorkPage = () => {
   );
 };
 
-const Card = ({ title, children, variant }) => {
-  const borderClass = {
-    error: 'border-red-500/30',
-    success: 'border-emerald-500/30',
-    submit: 'border-blue-500/30',
-    info: 'border-yellow-500/30',
-  }[variant] || 'border-zinc-800';
-
-  const bgClass = {
-    error: 'bg-red-500/5',
-    success: 'bg-emerald-500/5',
-    submit: 'bg-blue-500/5',
-    info: 'bg-yellow-500/5',
-  }[variant] || 'bg-[#111]';
-
+const Card = ({ title, children, icon, badge, variant }) => {
   return (
-    <div className={`border rounded-xl p-4 ${borderClass} ${bgClass}`}>
-      <div className="text-xs text-zinc-500 uppercase tracking-wider mb-3">{title}</div>
-      {children}
+    <div className={`rounded-2xl border overflow-hidden ${
+      variant === 'submit' 
+        ? 'border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-transparent' 
+        : 'border-white/[0.06] bg-[#0A0A0F]'
+    }`}>
+      <div className="px-5 py-4 border-b border-white/[0.06] bg-white/[0.02] flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {icon}
+          <span className="text-xs font-medium text-white/50 uppercase tracking-wide">{title}</span>
+        </div>
+        {badge && (
+          <span className="text-xs px-2 py-1 bg-blue-500/10 text-blue-400 rounded-lg">{badge}</span>
+        )}
+      </div>
+      <div className="p-5">
+        {children}
+      </div>
     </div>
   );
 };
 
 const StatusBadge = ({ status }) => {
   const config = {
-    assigned: { label: 'New', bg: 'bg-zinc-700', text: 'text-white' },
-    in_progress: { label: 'In Progress', bg: 'bg-blue-500', text: 'text-white' },
-    submitted: { label: 'Submitted', bg: 'bg-yellow-500', text: 'text-black' },
-    validation: { label: 'Validating', bg: 'bg-purple-500', text: 'text-white' },
-    revision: { label: 'Fix Required', bg: 'bg-red-500', text: 'text-white' },
-    completed: { label: 'Completed', bg: 'bg-emerald-500', text: 'text-white' },
-  }[status] || { label: status, bg: 'bg-zinc-700', text: 'text-white' };
+    assigned: { label: 'New', color: 'bg-white/10 text-white border-white/20' },
+    in_progress: { label: 'In Progress', color: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
+    submitted: { label: 'Submitted', color: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+    validation: { label: 'Validating', color: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
+    revision: { label: 'Fix Required', color: 'bg-red-500/10 text-red-400 border-red-500/20' },
+    completed: { label: 'Completed', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+  }[status] || { label: status, color: 'bg-white/10 text-white border-white/20' };
 
   return (
-    <span className={`inline-block px-3 py-1.5 rounded-lg text-sm font-medium ${config.bg} ${config.text}`}>
+    <span className={`inline-flex px-4 py-2 rounded-xl text-sm font-medium border ${config.color}`}>
       {config.label}
     </span>
   );
