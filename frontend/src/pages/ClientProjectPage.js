@@ -63,45 +63,56 @@ const ClientProjectPage = () => {
   };
 
   const simulateAiProcessing = () => {
-    const steps = [
-      { progress: 20, delay: 1000 },
-      { progress: 45, delay: 2000 },
-      { progress: 70, delay: 2500 },
-      { progress: 90, delay: 1500 },
-      { progress: 100, delay: 1000 },
+    // Start progress animation
+    const progressSteps = [
+      { progress: 15, delay: 500 },
+      { progress: 30, delay: 1000 },
+      { progress: 50, delay: 1500 },
+      { progress: 70, delay: 2000 },
+      { progress: 85, delay: 2500 },
     ];
     
     let totalDelay = 0;
-    steps.forEach(step => {
+    progressSteps.forEach(step => {
       totalDelay += step.delay;
       setTimeout(() => setAiProgress(step.progress), totalDelay);
     });
     
-    // Generate mock AI data
-    setTimeout(() => {
+    // Call real AI endpoint
+    callAiAnalysis();
+  };
+  
+  const callAiAnalysis = async () => {
+    try {
+      const res = await axios.post(`${API}/ai/analyze-project`, {
+        idea: originalIdea || project?.business_idea || project?.description || '',
+        request_id: projectId
+      }, { withCredentials: true });
+      
+      setAiProgress(100);
+      setGeneratedData({
+        features: res.data.features || [],
+        timeline: res.data.timeline || { design: '1 week', development: '4 weeks', testing: '1 week', total: '6 weeks' },
+        cost: res.data.cost || { min: 5000, max: 10000, currency: 'USD' }
+      });
+      
+      setTimeout(() => setAiProcessing(false), 500);
+    } catch (error) {
+      console.error('AI analysis error:', error);
+      // Fallback to mock data if AI fails
+      setAiProgress(100);
       setGeneratedData({
         features: [
-          { name: 'User Authentication', description: 'Secure login/register with email and social auth', hours: 8 },
-          { name: 'Vehicle Listings', description: 'Create, edit, delete vehicle listings with photos', hours: 16 },
-          { name: 'Search & Filters', description: 'Advanced search with make, model, year, price filters', hours: 12 },
-          { name: 'Offer System', description: 'Buyers can make offers, sellers can accept/reject', hours: 10 },
-          { name: 'Messaging', description: 'In-app chat between buyers and sellers', hours: 14 },
-          { name: 'Admin Dashboard', description: 'Manage users, listings, reports', hours: 12 },
+          { name: 'Core Feature 1', description: 'Main functionality based on your idea', hours: 16 },
+          { name: 'User Interface', description: 'Frontend implementation', hours: 20 },
+          { name: 'Backend API', description: 'Server-side logic and database', hours: 24 },
+          { name: 'Authentication', description: 'User login and security', hours: 8 },
         ],
-        timeline: {
-          design: '1 week',
-          development: '4-5 weeks',
-          testing: '1 week',
-          total: '6-7 weeks'
-        },
-        cost: {
-          min: 8500,
-          max: 12000,
-          currency: 'USD'
-        }
+        timeline: { design: '1 week', development: '3-4 weeks', testing: '1 week', total: '5-6 weeks' },
+        cost: { min: 5000, max: 8000, currency: 'USD' }
       });
-      setAiProcessing(false);
-    }, totalDelay + 500);
+      setTimeout(() => setAiProcessing(false), 500);
+    }
   };
 
   const handleSendMessage = () => {

@@ -4417,5 +4417,98 @@ async def shutdown_db_client():
     client.close()
 
 
+# ============ AI PROJECT ANALYSIS ============
+class AIAnalysisRequest(BaseModel):
+    idea: str
+    request_id: Optional[str] = None
+
+class AIFeature(BaseModel):
+    name: str
+    description: str
+    hours: int
+
+class AIAnalysisResponse(BaseModel):
+    features: List[AIFeature]
+    timeline: Dict[str, str]
+    cost: Dict[str, Any]
+
+@api_router.post("/ai/analyze-project")
+async def analyze_project_with_ai(request: AIAnalysisRequest):
+    """Use AI to analyze a project idea and generate features, timeline, and cost"""
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
+    import json
+    
+    api_key = os.environ.get('EMERGENT_LLM_KEY')
+    if not api_key:
+        raise HTTPException(status_code=500, detail="AI service not configured")
+    
+    try:
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=f"project-analysis-{request.request_id or uuid.uuid4().hex[:8]}",
+            system_message="""You are a senior software architect and project estimator. 
+Analyze the given project idea and provide a structured breakdown.
+Always respond with valid JSON only, no markdown, no explanations.
+The JSON must have this exact structure:
+{
+  "features": [
+    {"name": "Feature Name", "description": "Brief description", "hours": 8}
+  ],
+  "timeline": {
+    "design": "X week(s)",
+    "development": "X-Y weeks",
+    "testing": "X week(s)",
+    "total": "X-Y weeks"
+  },
+  "cost": {
+    "min": 5000,
+    "max": 10000,
+    "currency": "USD",
+    "hourly_rate": 75
+  }
+}
+Estimate realistically based on a mid-level development team.
+Include 4-8 core features. Hours per feature: 4-24h.
+Cost calculation: total_hours * hourly_rate (use $75/hour)."""
+        ).with_model("openai", "gpt-4o")
+        
+        user_message = UserMessage(
+            text=f"""Analyze this project idea and provide a JSON breakdown of features, timeline, and cost:
+
+PROJECT IDEA:
+{request.idea}
+
+Respond with JSON only."""
+        )
+        
+        response = await chat.send_message(user_message)
+        
+        # Parse JSON from response
+        # Clean up response - remove markdown code blocks if present
+        clean_response = response.strip()
+        if clean_response.startswith("```"):
+            clean_response = clean_response.split("```")[1]
+            if clean_response.startswith("json"):
+                clean_response = clean_response[4:]
+        clean_response = clean_response.strip()
+        
+        try:
+            result = json.loads(clean_response)
+        except json.JSONDecodeError:
+            # Try to find JSON in response
+            import re
+            json_match = re.search(r'\{[\s\S]*\}', response)
+            if json_match:
+                result = json.loads(json_match.group())
+            else:
+                raise HTTPException(status_code=500, detail="Failed to parse AI response")
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"AI analysis error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"AI analysis failed: {str(e)}")
+
+
 # Include the router in the main app (MUST be at the end after all routes defined)
 fastapi_app.include_router(api_router)
